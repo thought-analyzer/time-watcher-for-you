@@ -121,11 +121,8 @@ function createMainWindow() {
     mainWindow.show();
   });
 
-  mainWindow.on('close', (e) => {
-    if (!app.isQuiting) {
-      e.preventDefault();
-      mainWindow.hide();
-    }
+  mainWindow.on('close', () => {
+    app.quit();
   });
 }
 
@@ -721,7 +718,7 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
-  // Keep running in tray
+  app.quit();
 });
 
 app.on('before-quit', () => {

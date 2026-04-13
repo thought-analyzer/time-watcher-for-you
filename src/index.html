@@ -81,14 +81,14 @@
 }
 [data-theme="forest"] {
   --bg:      #f0fdf4;
-  --bg2:     rgba(22,163,74,0.06);
-  --bg3:     rgba(22,163,74,0.12);
-  --bg4:     rgba(22,163,74,0.18);
-  --border:  rgba(22,163,74,0.15);
-  --border2: rgba(22,163,74,0.30);
+  --bg2:     #dcfce7;
+  --bg3:     #bbf7d0;
+  --bg4:     #ecfdf5;
+  --border:  rgba(22,163,74,0.18);
+  --border2: rgba(22,163,74,0.35);
   --text:    #052e16;
   --text2:   #166534;
-  --text3:   #bbf7d0;
+  --text3:   #86efac;
   --accent:  #16a34a;
   --accent2: #15803d;
   --green:   #16a34a;
@@ -98,14 +98,14 @@
 }
 [data-theme="ocean"] {
   --bg:      #f0f9ff;
-  --bg2:     rgba(2,132,199,0.06);
-  --bg3:     rgba(2,132,199,0.12);
-  --bg4:     rgba(2,132,199,0.18);
-  --border:  rgba(2,132,199,0.15);
-  --border2: rgba(2,132,199,0.30);
+  --bg2:     #dbeafe;
+  --bg3:     #bae6fd;
+  --bg4:     #e0f2fe;
+  --border:  rgba(2,132,199,0.18);
+  --border2: rgba(2,132,199,0.35);
   --text:    #0c4a6e;
   --text2:   #0369a1;
-  --text3:   #bae6fd;
+  --text3:   #7dd3fc;
   --accent:  #0284c7;
   --accent2: #0369a1;
   --green:   #059669;
@@ -115,14 +115,14 @@
 }
 [data-theme="rose"] {
   --bg:      #fff1f6;
-  --bg2:     rgba(219,39,119,0.06);
-  --bg3:     rgba(219,39,119,0.12);
-  --bg4:     rgba(219,39,119,0.18);
-  --border:  rgba(219,39,119,0.15);
-  --border2: rgba(219,39,119,0.30);
+  --bg2:     #fce7f3;
+  --bg3:     #fbcfe8;
+  --bg4:     #fdf2f8;
+  --border:  rgba(219,39,119,0.18);
+  --border2: rgba(219,39,119,0.35);
   --text:    #500724;
   --text2:   #9d174d;
-  --text3:   #fbcfe8;
+  --text3:   #f9a8d4;
   --accent:  #db2777;
   --accent2: #be185d;
   --green:   #059669;
@@ -446,6 +446,10 @@ body {
   opacity: 0; pointer-events: none;
   transition: opacity .18s;
 }
+[data-theme="forest"] .modal-overlay,
+[data-theme="ocean"] .modal-overlay,
+[data-theme="rose"] .modal-overlay,
+[data-theme="chalk"] .modal-overlay { background: rgba(0,0,0,.18); backdrop-filter: blur(3px); }
 .modal-overlay.open { opacity: 1; pointer-events: all; }
 .modal {
   background: var(--bg4);
@@ -478,6 +482,17 @@ body {
 .form-row { display: flex; gap: 12px; }
 .form-row .form-group { flex: 1; }
 .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 24px; }
+
+/* Light theme modals — explicit override */
+[data-theme="forest"] .modal { background: #ecfdf5; }
+[data-theme="forest"] .modal .form-group input,
+[data-theme="forest"] .modal .form-group select { background: #f0fdf4; color: #052e16; }
+[data-theme="ocean"] .modal { background: #e0f2fe; }
+[data-theme="ocean"] .modal .form-group input,
+[data-theme="ocean"] .modal .form-group select { background: #f0f9ff; color: #0c4a6e; }
+[data-theme="rose"] .modal { background: #fdf2f8; }
+[data-theme="rose"] .modal .form-group input,
+[data-theme="rose"] .modal .form-group select { background: #fff1f6; color: #500724; }
 
 /* Color picker */
 .color-options { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -1250,6 +1265,28 @@ function openActivityModal(activity = null) {
 
   document.getElementById('activity-modal').classList.add('open');
   document.getElementById('input-name').focus();
+  applyModalTheme();
+}
+
+function applyModalTheme() {
+  const theme = document.documentElement.dataset.theme || 'void';
+  const modal = document.querySelector('#activity-modal .modal');
+  if (!modal) return;
+  const lightBg = { chalk: '#ffffff', forest: '#ecfdf5', ocean: '#e0f2fe', rose: '#fdf2f8' };
+  const lightInput = { chalk: '#f5f5f5', forest: '#f0fdf4', ocean: '#f0f9ff', rose: '#fff1f6' };
+  if (lightBg[theme]) {
+    modal.style.background = lightBg[theme];
+    modal.querySelectorAll('input, select').forEach(el => {
+      el.style.background = lightInput[theme];
+      el.style.color = 'inherit';
+    });
+  } else {
+    modal.style.background = '';
+    modal.querySelectorAll('input, select').forEach(el => {
+      el.style.background = '';
+      el.style.color = '';
+    });
+  }
 }
 
 function closeActivityModal() {
