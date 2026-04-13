@@ -37,6 +37,13 @@ Built as a companion tool to the [thought-analyzer](https://github.com/hapi_happ
 
 Download and run the installer — no setup required.
 
+> **Recommended browser: Google Chrome**
+> Microsoft Edge may block the download. If you see a `.crdownload` file instead of `.exe`, use Chrome instead.
+>
+> Windows may show a security warning ("Windows protected your PC") because the app is not code-signed. Click **More info → Run anyway** to proceed.
+>
+> If you have concerns about running an unsigned executable, install from source instead (see below).
+
 ### Run from source
 
 ```bash

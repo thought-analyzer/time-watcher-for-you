@@ -37,8 +37,8 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "installerLanguages": ["ja"],
-      "language": "1041"
+      "installerLanguages": ["en", "ja"],
+      "language": "1033"
     }
   },
   "devDependencies": {
