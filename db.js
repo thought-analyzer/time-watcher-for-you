@@ -204,6 +204,11 @@ function getClaudeSegmentBreakdown(dateStr) {
   return result;
 }
 
+function deleteRecord(dateStr, recordId) {
+  const records = getRecordsForDate(dateStr).filter(r => r.id !== recordId);
+  saveRecordsForDate(dateStr, records);
+}
+
 /** Get open (not stopped) records for today */
 function getOpenRecords() {
   const dateStr = todayStr();
@@ -220,6 +225,7 @@ module.exports = {
   startRecord,
   stopRecord,
   updateRecord,
+  deleteRecord,
   getRecordsForDate,
   getRecordsForRange,
   getDailySummary,

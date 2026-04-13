@@ -19,6 +19,8 @@ contextBridge.exposeInMainWorld('api', {
   getRecordsForDate: (dateStr) => ipcRenderer.invoke('db:getRecordsForDate', dateStr),
   getRecordsForRange: (start, end) => ipcRenderer.invoke('db:getRecordsForRange', start, end),
   getOpenRecords: () => ipcRenderer.invoke('db:getOpenRecords'),
+  deleteRecord: (dateStr, recordId) => ipcRenderer.invoke('db:deleteRecord', dateStr, recordId),
+  updateRecord: (dateStr, recordId, updates) => ipcRenderer.invoke('db:updateRecord', dateStr, recordId, updates),
   getWindowBreakdown: (dateStr) => ipcRenderer.invoke('db:getWindowBreakdown', dateStr),
   getClaudeSegmentBreakdown: (dateStr) => ipcRenderer.invoke('db:getClaudeSegmentBreakdown', dateStr),
 

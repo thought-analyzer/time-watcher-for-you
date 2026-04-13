@@ -784,8 +784,14 @@ body {
         <div id="claude-segment-list"></div>
       </div>
       <div class="chart-container" id="window-breakdown-section" style="display:none">
-        <div class="chart-title">Window Breakdown（画面ごとの時間）</div>
+        <div class="chart-title" data-i18n="analytics_window">Window Breakdown</div>
         <div id="window-breakdown-list"></div>
+      </div>
+      <div class="chart-container" id="records-section">
+        <div class="chart-title" style="display:flex;align-items:center;justify-content:space-between;">
+          <span data-i18n="analytics_records">Records</span>
+        </div>
+        <div id="records-list" style="margin-top:8px;"></div>
       </div>
     </div>
 
@@ -798,7 +804,7 @@ body {
       <!-- Setup Guide -->
       <div class="settings-section" id="setup-guide-section">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-          <h3 style="margin:0;">セットアップガイド</h3>
+          <h3 style="margin:0;" data-i18n="setup_guide">Setup Guide</h3>
           <span id="setup-progress" style="font-size:12px;color:var(--text2);"></span>
         </div>
         <div id="setup-steps-list"></div>
@@ -809,8 +815,8 @@ body {
         <h3>Tracking</h3>
         <div class="setting-row">
           <div>
-            <div class="setting-label">Auto Window Tracking</div>
-            <div class="setting-desc">紐づけたウィンドウが前面になると自動でタイマー開始/停止</div>
+            <div class="setting-label" data-i18n="setting_auto_track_label">Auto Window Tracking</div>
+            <div class="setting-desc" data-i18n="setting_auto_track_desc">Starts/stops timer when linked window becomes active</div>
           </div>
           <label class="toggle">
             <input type="checkbox" id="setting-auto-track" onchange="toggleAutoTrack(this.checked)">
@@ -820,8 +826,8 @@ body {
         </div>
         <div class="setting-row">
           <div>
-            <div class="setting-label">Idle Detection（アイドル自動ポーズ）</div>
-            <div class="setting-desc">マウス/キーボード無操作が続くとタイマーを自動ポーズ</div>
+            <div class="setting-label" data-i18n="setting_idle_label">Idle Detection</div>
+            <div class="setting-desc" data-i18n="setting_idle_desc">Auto-pause timer when keyboard/mouse inactive</div>
           </div>
           <label class="toggle">
             <input type="checkbox" id="setting-idle" onchange="toggleIdle(this.checked)">
@@ -831,8 +837,8 @@ body {
         </div>
         <div class="setting-row" id="idle-threshold-row" style="display:none">
           <div>
-            <div class="setting-label">アイドル判定時間</div>
-            <div class="setting-desc">この時間操作なしでタイマーをポーズ</div>
+            <div class="setting-label" data-i18n="setting_idle_threshold_label">Idle Threshold</div>
+            <div class="setting-desc" data-i18n="setting_idle_threshold_desc">Pause timer after this duration of inactivity</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
             <input type="range" id="idle-threshold-slider" min="1" max="30" value="3"
@@ -851,15 +857,15 @@ body {
         </div>
         <div class="setting-row">
           <div>
-            <div class="setting-label">Claude Code Hookを設定する</div>
-            <div class="setting-desc">~/.claude/settings.json にhookを自動追記します</div>
+            <div class="setting-label" data-i18n="setting_claude_hook_label">Configure Claude Code Hook</div>
+            <div class="setting-desc" data-i18n="setting_claude_hook_desc">Adds hook config to ~/.claude/settings.json</div>
           </div>
           <button class="btn btn-primary" style="font-size:12px;padding:6px 14px;" onclick="applyClaudeHooks()">
             Apply Hooks
           </button>
         </div>
         <div id="claude-segment-display" style="margin-top:10px;font-size:12px;color:var(--text2);display:none">
-          現在のセグメント: <strong id="claude-segment-value">—</strong>
+          <span data-i18n="setting_current_segment">Current segment: </span><strong id="claude-segment-value">—</strong>
         </div>
       </div>
 
@@ -868,8 +874,8 @@ body {
         <h3>Display</h3>
         <div class="setting-row" style="align-items:flex-start;">
           <div>
-            <div class="setting-label">テーマ</div>
-            <div class="setting-desc">アプリとオーバーレイに適用されます</div>
+            <div class="setting-label" data-i18n="setting_theme_label">Theme</div>
+            <div class="setting-desc" data-i18n="setting_theme_desc">Applied to app and overlay</div>
           </div>
           <div style="display:flex;gap:8px;flex-shrink:0;">
             <button class="theme-swatch" data-theme="void"   onclick="setTheme('void')"   title="Void"   style="background:#060606;border-color:#444;"></button>
@@ -881,8 +887,8 @@ body {
         </div>
         <div class="setting-row">
           <div>
-            <div class="setting-label">Show Overlay</div>
-            <div class="setting-desc">常時表示タイマーウィンドウ</div>
+            <div class="setting-label" data-i18n="setting_overlay_label">Show Overlay</div>
+            <div class="setting-desc" data-i18n="setting_overlay_desc">Always-on-top timer widget</div>
           </div>
           <label class="toggle">
             <input type="checkbox" id="setting-overlay" checked onchange="toggleOverlay(this.checked)">
@@ -892,8 +898,8 @@ body {
         </div>
         <div class="setting-row">
           <div>
-            <div class="setting-label">ログイン時に自動起動</div>
-            <div class="setting-desc">Windows起動時にアプリをトレイに常駐させます</div>
+            <div class="setting-label" data-i18n="setting_login_label">Launch at Login</div>
+            <div class="setting-desc" data-i18n="setting_login_desc">Start app when Windows boots</div>
           </div>
           <label class="toggle">
             <input type="checkbox" id="setting-login" onchange="toggleLoginItem(this.checked)">
@@ -903,8 +909,8 @@ body {
         </div>
         <div class="setting-row">
           <div>
-            <div class="setting-label">目標通知</div>
-            <div class="setting-desc">目標達成・上限超過時にデスクトップ通知を表示</div>
+            <div class="setting-label" data-i18n="setting_notify_label">Goal Notifications</div>
+            <div class="setting-desc" data-i18n="setting_notify_desc">Desktop notification when goal reached or exceeded</div>
           </div>
           <label class="toggle">
             <input type="checkbox" id="setting-notify" onchange="toggleNotify(this.checked)">
@@ -914,13 +920,27 @@ body {
         </div>
       </div>
 
-      <!-- Data section -->
+      <!-- Language section -->
       <div class="settings-section">
-        <h3>Data</h3>
+        <h3 data-i18n="setting_language_section">Language</h3>
         <div class="setting-row">
           <div>
-            <div class="setting-label">データをエクスポート</div>
-            <div class="setting-desc">全活動・全記録をJSONファイルに保存します</div>
+            <div class="setting-label" data-i18n="setting_language_label">Display Language</div>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button id="lang-en" class="btn btn-ghost" style="font-size:12px;padding:5px 14px;" onclick="setLang('en')">EN</button>
+            <button id="lang-ja" class="btn btn-ghost" style="font-size:12px;padding:5px 14px;" onclick="setLang('ja')">JA</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data section -->
+      <div class="settings-section">
+        <h3 data-i18n="setting_data_section">Data</h3>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label" data-i18n="setting_export_label">Export Data</div>
+            <div class="setting-desc" data-i18n="setting_export_desc">Save all activities and records as JSON</div>
           </div>
           <button class="btn btn-ghost" style="font-size:12px;padding:6px 14px;" onclick="exportData()">
             Export JSON
@@ -1024,6 +1044,24 @@ body {
   </div>
 </div>
 
+<div class="modal-overlay" id="record-edit-modal">
+  <div class="modal" style="width:380px;">
+    <h3 data-i18n="record_edit_title">Edit Record</h3>
+    <div class="form-group">
+      <label data-i18n="record_edit_start">Start Time</label>
+      <input type="datetime-local" id="record-edit-start">
+    </div>
+    <div class="form-group">
+      <label data-i18n="record_edit_end">End Time</label>
+      <input type="datetime-local" id="record-edit-end">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeRecordEditModal()" data-i18n="cancel">Cancel</button>
+      <button class="btn btn-primary" onclick="saveRecordEdit()" data-i18n="save">Save</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -1043,6 +1081,224 @@ const COLORS = [
   '#7c7cff', '#4ade80', '#f87171', '#fbbf24', '#60a5fa',
   '#e879f9', '#34d399', '#fb923c', '#a78bfa', '#f472b6',
 ];
+
+// ── i18n ─────────────────────────────────────────────────────────────────────
+let currentLang = 'en';
+
+const STRINGS = {
+  en: {
+    setup_guide: 'Setup Guide',
+    setting_auto_track_label: 'Auto Window Tracking',
+    setting_auto_track_desc: 'Starts/stops timer when linked window becomes active',
+    setting_idle_label: 'Idle Detection',
+    setting_idle_desc: 'Auto-pause timer when keyboard/mouse inactive',
+    setting_idle_threshold_label: 'Idle Threshold',
+    setting_idle_threshold_desc: 'Pause timer after this duration of inactivity',
+    setting_claude_hook_label: 'Configure Claude Code Hook',
+    setting_claude_hook_desc: 'Adds hook config to ~/.claude/settings.json',
+    setting_current_segment: 'Current segment: ',
+    setting_theme_label: 'Theme', setting_theme_desc: 'Applied to app and overlay',
+    setting_overlay_label: 'Show Overlay', setting_overlay_desc: 'Always-on-top timer widget',
+    setting_login_label: 'Launch at Login', setting_login_desc: 'Start app when Windows boots',
+    setting_notify_label: 'Goal Notifications', setting_notify_desc: 'Desktop notification when goal reached or exceeded',
+    setting_export_label: 'Export Data', setting_export_desc: 'Save all activities and records as JSON',
+    setting_language_section: 'Language', setting_language_label: 'Display Language',
+    setting_data_section: 'Data',
+    analytics_window: 'Window Breakdown',
+    analytics_records: 'Records',
+    analytics_claude: 'Claude Efficiency (AI vs User)',
+    setup_step1_title: 'Create an activity to track',
+    setup_step1_desc: 'Track by category (Work, Study, etc.) or by app (e.g. Claude Code). Multiple activities OK.',
+    setup_step2_title: 'Link a window to Claude Code',
+    setup_step2_desc: 'Select a window with "Claude Code" in the title to enable auto-tracking',
+    setup_step3_title: 'Enable Auto Window Tracking',
+    setup_step3_desc: 'Timer starts/stops automatically when the linked window becomes active',
+    setup_step4_title: 'Apply Claude Hooks',
+    setup_step4_desc: 'Tracks user vs AI time separately. Restart Claude Code after applying.',
+    btn_create_activity: 'Create Activity', btn_link_window: 'Link',
+    btn_enable: 'Enable', btn_apply_hooks: 'Apply Hooks',
+    idle_min: (n) => `${n} min`,
+    records_no_records: 'No records for this date.',
+    records_delete_confirm: 'Delete this record?',
+    records_start: 'Start', records_end: 'End', records_duration: 'Duration',
+    records_activity: 'Activity', records_mode: 'Mode',
+    record_edit_title: 'Edit Record',
+    record_edit_start: 'Start Time', record_edit_end: 'End Time',
+    cancel: 'Cancel', save: 'Save',
+  },
+  ja: {
+    setup_guide: 'セットアップガイド',
+    setting_auto_track_label: '自動ウィンドウ追跡',
+    setting_auto_track_desc: '紐づけたウィンドウが前面になると自動でタイマー開始/停止',
+    setting_idle_label: 'アイドル検出（自動ポーズ）',
+    setting_idle_desc: 'マウス/キーボード無操作が続くとタイマーを自動ポーズ',
+    setting_idle_threshold_label: 'アイドル判定時間',
+    setting_idle_threshold_desc: 'この時間操作なしでタイマーをポーズ',
+    setting_claude_hook_label: 'Claude Code Hookを設定する',
+    setting_claude_hook_desc: '~/.claude/settings.json にhookを自動追記します',
+    setting_current_segment: '現在のセグメント: ',
+    setting_theme_label: 'テーマ', setting_theme_desc: 'アプリとオーバーレイに適用されます',
+    setting_overlay_label: 'オーバーレイ表示', setting_overlay_desc: '常時表示タイマーウィンドウ',
+    setting_login_label: 'ログイン時に自動起動', setting_login_desc: 'Windows起動時にアプリをトレイに常駐',
+    setting_notify_label: '目標通知', setting_notify_desc: '目標達成・上限超過時にデスクトップ通知',
+    setting_export_label: 'データをエクスポート', setting_export_desc: '全活動・全記録をJSONで保存',
+    setting_language_section: '言語', setting_language_label: '表示言語',
+    setting_data_section: 'データ',
+    analytics_window: 'ウィンドウ別の時間',
+    analytics_records: 'レコード一覧',
+    analytics_claude: 'Claude 作業効率（自律実行 vs ユーザー操作）',
+    setup_step1_title: '計測したい活動を作成する',
+    setup_step1_desc: 'Work・Studyなど活動単位でも、アプリ単位（例: Claude Code）でも登録できます。',
+    setup_step2_title: 'Claude Code ウィンドウを紐づける',
+    setup_step2_desc: 'タイトルに「Claude Code」を含むウィンドウを選ぶと自動計測が始まります',
+    setup_step3_title: 'Auto Window Tracking をONにする',
+    setup_step3_desc: '紐づけたウィンドウが前面になると自動でタイマーが起動・停止します',
+    setup_step4_title: 'Claude Hook を適用する',
+    setup_step4_desc: 'ユーザー操作 / Claude自律実行の時間を分けて記録します。適用後はClaude Codeを再起動。',
+    btn_create_activity: '活動を作成', btn_link_window: '紐づける',
+    btn_enable: 'ONにする', btn_apply_hooks: 'Hookを適用',
+    idle_min: (n) => `${n}分`,
+    records_no_records: 'この日のレコードはありません。',
+    records_delete_confirm: 'このレコードを削除しますか？',
+    records_start: '開始', records_end: '終了', records_duration: '時間',
+    records_activity: '活動', records_mode: 'モード',
+    record_edit_title: 'レコード編集',
+    record_edit_start: '開始時刻', record_edit_end: '終了時刻',
+    cancel: 'キャンセル', save: '保存',
+  },
+};
+
+function t(key) {
+  const s = STRINGS[currentLang] || STRINGS.en;
+  return s[key] !== undefined ? s[key] : (STRINGS.en[key] !== undefined ? STRINGS.en[key] : key);
+}
+
+function applyLang() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (STRINGS[currentLang] && STRINGS[currentLang][key] !== undefined)
+      el.textContent = STRINGS[currentLang][key];
+    else if (STRINGS.en[key] !== undefined)
+      el.textContent = STRINGS.en[key];
+  });
+  document.getElementById('lang-en').style.fontWeight = currentLang === 'en' ? '700' : '400';
+  document.getElementById('lang-ja').style.fontWeight = currentLang === 'ja' ? '700' : '400';
+}
+
+async function setLang(lang) {
+  currentLang = lang;
+  await window.api.setSettings({ lang });
+  applyLang();
+  if (currentPage === 'analytics') renderRawRecords(analyticsDate);
+  refreshSetupGuide();
+  showToast(lang === 'ja' ? '言語: 日本語' : 'Language: English');
+}
+
+// ── Records ───────────────────────────────────────────────────────────────────
+let editingRecord = null;
+
+async function renderRawRecords(dateStr) {
+  const container = document.getElementById('records-list');
+  if (!container) return;
+  const [records, acts] = await Promise.all([
+    window.api.getRecordsForDate(dateStr),
+    window.api.getActivities(),
+  ]);
+  const actMap = Object.fromEntries(acts.map(a => [a.id, a]));
+
+  if (!records.length) {
+    container.innerHTML = `<div style="font-size:12px;color:var(--text2);padding:8px 0;">${t('records_no_records')}</div>`;
+    return;
+  }
+
+  const sorted = [...records].sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+  const fmtTime = iso => iso ? new Date(iso).toLocaleTimeString(currentLang === 'ja' ? 'ja-JP' : 'en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '—';
+  const fmtDur = sec => {
+    const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    return h ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${m}:${String(s).padStart(2,'0')}`;
+  };
+
+  container.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:12px;">
+      <thead>
+        <tr style="color:var(--text2);border-bottom:1px solid var(--border);">
+          <th style="padding:5px 8px;text-align:left;">${t('records_activity')}</th>
+          <th style="padding:5px 8px;text-align:left;">${t('records_start')}</th>
+          <th style="padding:5px 8px;text-align:left;">${t('records_end')}</th>
+          <th style="padding:5px 8px;text-align:left;">${t('records_duration')}</th>
+          <th style="padding:5px 8px;text-align:left;">${t('records_mode')}</th>
+          <th style="padding:5px 8px;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${sorted.map(r => {
+          const act = actMap[r.activityId];
+          const dur = r.endTime ? r.durationSeconds : Math.floor((Date.now() - new Date(r.startTime)) / 1000);
+          return `
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:6px 8px;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="width:8px;height:8px;border-radius:50%;background:${act ? act.color : '#888'};flex-shrink:0;"></div>
+                <span>${esc(act ? act.name : r.activityId)}</span>
+              </div>
+            </td>
+            <td style="padding:6px 8px;font-family:monospace;">${fmtTime(r.startTime)}</td>
+            <td style="padding:6px 8px;font-family:monospace;">${r.endTime ? fmtTime(r.endTime) : '<span style="color:var(--accent)">●</span>'}</td>
+            <td style="padding:6px 8px;font-family:monospace;">${fmtDur(dur)}</td>
+            <td style="padding:6px 8px;color:var(--text2);">${r.mode || 'manual'}</td>
+            <td style="padding:6px 8px;display:flex;gap:4px;justify-content:flex-end;">
+              <button onclick="openRecordEdit('${r.id}','${dateStr}')" style="background:none;border:1px solid var(--border);border-radius:4px;padding:2px 8px;color:var(--text2);cursor:pointer;font-size:11px;">✏</button>
+              <button onclick="deleteRecordRow('${r.id}','${dateStr}')" style="background:none;border:1px solid var(--border);border-radius:4px;padding:2px 8px;color:var(--red);cursor:pointer;font-size:11px;">✕</button>
+            </td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+}
+
+async function deleteRecordRow(recordId, dateStr) {
+  if (!confirm(t('records_delete_confirm'))) return;
+  await window.api.deleteRecord(dateStr, recordId);
+  renderRawRecords(dateStr);
+  showToast('Deleted');
+}
+
+async function openRecordEdit(recordId, dateStr) {
+  const records = await window.api.getRecordsForDate(dateStr);
+  const r = records.find(x => x.id === recordId);
+  if (!r) return;
+  editingRecord = { ...r, dateStr };
+
+  const toLocal = iso => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().slice(0,16);
+  };
+
+  document.getElementById('record-edit-start').value = toLocal(r.startTime);
+  document.getElementById('record-edit-end').value = toLocal(r.endTime);
+  document.getElementById('record-edit-modal').classList.add('open');
+}
+
+async function saveRecordEdit() {
+  if (!editingRecord) return;
+  const startVal = document.getElementById('record-edit-start').value;
+  const endVal = document.getElementById('record-edit-end').value;
+  const startTime = startVal ? new Date(startVal).toISOString() : editingRecord.startTime;
+  const endTime = endVal ? new Date(endVal).toISOString() : editingRecord.endTime;
+  const durationSeconds = endTime ? Math.max(0, Math.floor((new Date(endTime) - new Date(startTime)) / 1000)) : 0;
+  await window.api.updateRecord(editingRecord.dateStr, editingRecord.id, { startTime, endTime, durationSeconds });
+  document.getElementById('record-edit-modal').classList.remove('open');
+  editingRecord = null;
+  renderRawRecords(analyticsDate);
+  showToast('Saved');
+}
+
+function closeRecordEditModal() {
+  document.getElementById('record-edit-modal').classList.remove('open');
+  editingRecord = null;
+}
 
 // ── Init ─────────────────────────────────────────────────────────────────────
 async function init() {
@@ -2298,6 +2554,9 @@ async function initSettings() {
   document.getElementById('setting-auto-track').checked = settings.autoTrack || false;
   document.getElementById('setting-login').checked = settings.startWithLogin || false;
   document.getElementById('setting-notify').checked = settings.goalNotifications !== false;
+
+  currentLang = settings.lang || 'en';
+  applyLang();
 
   const currentTheme = settings.theme || 'void';
   document.documentElement.dataset.theme = currentTheme;

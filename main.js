@@ -501,6 +501,8 @@ function registerIPC() {
   ipcMain.handle('db:deleteActivity', (_, id) => db.deleteActivity(id));
   ipcMain.handle('db:startRecord', (_, data) => db.startRecord(data));
   ipcMain.handle('db:stopRecord', (_, id) => db.stopRecord(id));
+  ipcMain.handle('db:deleteRecord', (_, dateStr, recordId) => db.deleteRecord(dateStr, recordId));
+  ipcMain.handle('db:updateRecord', (_, dateStr, recordId, updates) => db.updateRecord(dateStr, recordId, updates));
   ipcMain.handle('db:getDailySummary', (_, dateStr) => db.getDailySummary(dateStr));
   ipcMain.handle('db:getRangeSummary', (_, start, end) => db.getRangeSummary(start, end));
   ipcMain.handle('db:getRecordsForDate', (_, dateStr) => db.getRecordsForDate(dateStr));
@@ -724,6 +726,7 @@ app.on('window-all-closed', () => {
 app.on('before-quit', () => {
   app.isQuiting = true;
   stopAllTimers();
+  disableAutoTrack();
   stopIdleDetection();
   claudeHookServer.stop();
 });
