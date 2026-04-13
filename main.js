@@ -55,8 +55,29 @@ const idlePausedTimers = new Set();
 /** Current Claude Code segment: 'user' | 'claude' | null */
 let claudeSegment = null;
 
-/** Goal notifications already fired today: Set<"activityId-goalType-date"> */
+/** Goal notifications already fired today: Set<"activityId-goalType-date"> — persisted to disk */
 const notifiedGoals = new Set();
+
+function getNotifiedGoalsFile() {
+  return path.join(app.getPath('userData'), 'data', 'notified-goals.json');
+}
+function loadNotifiedGoals() {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const data = JSON.parse(fs.readFileSync(getNotifiedGoalsFile(), 'utf8'));
+    // 今日分だけ復元、古い日付は捨てる
+    for (const key of (data.keys || [])) {
+      if (key.endsWith(today)) notifiedGoals.add(key);
+    }
+  } catch {}
+}
+function saveNotifiedGoals() {
+  try {
+    const dir = path.join(app.getPath('userData'), 'data');
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(getNotifiedGoalsFile(), JSON.stringify({ keys: [...notifiedGoals] }), 'utf8');
+  } catch {}
+}
 
 let settings = {};
 let autoTrackEnabled = false;
@@ -251,6 +272,7 @@ function checkGoalNotifications(state) {
     const key = `${t.activityId}-${t.goalType}-${today}`;
     if (!notifiedGoals.has(key) && t.todaySeconds >= goalSec && settings.goalNotifications !== false) {
       notifiedGoals.add(key);
+      saveNotifiedGoals();
       const isMin = t.goalType === 'min';
       new Notification({
         title: isMin ? '🎯 目標達成!' : '⚠️ 上限超過',
@@ -677,6 +699,7 @@ app.whenReady().then(() => {
   const userDataPath = path.join(app.getPath('userData'), 'data');
   db.setDataDir(userDataPath);
   settings = loadSettings();
+  loadNotifiedGoals();
 
   registerIPC();
   createMainWindow();
