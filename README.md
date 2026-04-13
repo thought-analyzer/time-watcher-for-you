@@ -31,14 +31,16 @@ Built as a companion tool to the [thought-analyzer](https://github.com/hapi_happ
 
 ## Installation
 
-### Option A — Installer (recommended)
+### Download installer (Windows)
 
-Download `Time Watcher Setup x.x.x.exe` from [Releases](../../releases) and run it.
+👉 **[Download Time Watcher Setup .exe](https://github.com/thought-analyzer/time-watcher-for-you/releases/latest)**
 
-### Option B — From source
+Download and run the installer — no setup required.
+
+### Run from source
 
 ```bash
-git clone https://github.com/hapi_happy/time-watcher-for-you.git
+git clone https://github.com/thought-analyzer/time-watcher-for-you.git
 cd time-watcher-for-you
 npm install
 npm start
