@@ -788,10 +788,19 @@ body {
         <div id="window-breakdown-list"></div>
       </div>
       <div class="chart-container" id="records-section">
-        <div class="chart-title" style="display:flex;align-items:center;justify-content:space-between;">
+        <div class="chart-title" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="toggleRecordsCollapse()">
           <span data-i18n="analytics_records">Records</span>
+          <span id="records-collapse-icon" style="font-size:12px;color:var(--text2);">▼</span>
         </div>
-        <div id="records-list" style="margin-top:8px;"></div>
+        <div id="records-body" style="margin-top:8px;">
+          <div id="records-bulk-bar" style="display:none;margin-bottom:6px;display:flex;gap:6px;align-items:center;">
+            <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px;">
+              <input type="checkbox" id="records-select-all" onchange="toggleSelectAllRecords(this.checked)"> <span data-i18n="select_all">Select All</span>
+            </label>
+            <button onclick="deleteSelectedRecords()" style="background:none;border:1px solid var(--red);border-radius:4px;padding:2px 10px;color:var(--red);cursor:pointer;font-size:11px;" data-i18n="delete_selected">Delete Selected</button>
+          </div>
+          <div id="records-list"></div>
+        </div>
       </div>
     </div>
 
@@ -1125,6 +1134,7 @@ const STRINGS = {
     record_edit_title: 'Edit Record',
     record_edit_start: 'Start Time', record_edit_end: 'End Time',
     cancel: 'Cancel', save: 'Save',
+    select_all: 'Select All', delete_selected: 'Delete Selected',
   },
   ja: {
     setup_guide: 'セットアップガイド',
@@ -1165,6 +1175,7 @@ const STRINGS = {
     record_edit_title: 'レコード編集',
     record_edit_start: '開始時刻', record_edit_end: '終了時刻',
     cancel: 'キャンセル', save: '保存',
+    select_all: '全選択', delete_selected: '選択削除',
   },
 };
 
@@ -1196,6 +1207,29 @@ async function setLang(lang) {
 
 // ── Records ───────────────────────────────────────────────────────────────────
 let editingRecord = null;
+let recordsCollapsed = false;
+
+function toggleRecordsCollapse() {
+  recordsCollapsed = !recordsCollapsed;
+  document.getElementById('records-body').style.display = recordsCollapsed ? 'none' : '';
+  document.getElementById('records-collapse-icon').textContent = recordsCollapsed ? '▶' : '▼';
+}
+
+function toggleSelectAllRecords(checked) {
+  document.querySelectorAll('.record-checkbox').forEach(cb => { cb.checked = checked; });
+}
+
+async function deleteSelectedRecords() {
+  const checked = [...document.querySelectorAll('.record-checkbox:checked')];
+  if (!checked.length) return;
+  if (!confirm(t('records_delete_confirm'))) return;
+  for (const cb of checked) {
+    await window.api.deleteRecord(cb.dataset.date, cb.dataset.id);
+  }
+  document.getElementById('records-select-all').checked = false;
+  renderRawRecords(analyticsDate);
+  showToast('Deleted');
+}
 
 async function renderRawRecords(dateStr) {
   const container = document.getElementById('records-list');
@@ -1205,6 +1239,10 @@ async function renderRawRecords(dateStr) {
     window.api.getActivities(),
   ]);
   const actMap = Object.fromEntries(acts.map(a => [a.id, a]));
+
+  // Show/hide bulk bar
+  const bulkBar = document.getElementById('records-bulk-bar');
+  if (bulkBar) bulkBar.style.display = records.length ? 'flex' : 'none';
 
   if (!records.length) {
     container.innerHTML = `<div style="font-size:12px;color:var(--text2);padding:8px 0;">${t('records_no_records')}</div>`;
@@ -1222,6 +1260,7 @@ async function renderRawRecords(dateStr) {
     <table style="width:100%;border-collapse:collapse;font-size:12px;">
       <thead>
         <tr style="color:var(--text2);border-bottom:1px solid var(--border);">
+          <th style="padding:5px 4px;width:20px;"></th>
           <th style="padding:5px 8px;text-align:left;">${t('records_activity')}</th>
           <th style="padding:5px 8px;text-align:left;">${t('records_start')}</th>
           <th style="padding:5px 8px;text-align:left;">${t('records_end')}</th>
@@ -1236,6 +1275,9 @@ async function renderRawRecords(dateStr) {
           const dur = r.endTime ? r.durationSeconds : Math.floor((Date.now() - new Date(r.startTime)) / 1000);
           return `
           <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:6px 4px;text-align:center;">
+              <input type="checkbox" class="record-checkbox" data-id="${r.id}" data-date="${dateStr}">
+            </td>
             <td style="padding:6px 8px;">
               <div style="display:flex;align-items:center;gap:6px;">
                 <div style="width:8px;height:8px;border-radius:50%;background:${act ? act.color : '#888'};flex-shrink:0;"></div>
@@ -1802,7 +1844,9 @@ async function loadAnalytics() {
     renderWindowBreakdown(wb);
     renderClaudeSegment(claudeSeg);
     wbSection.style.display = '';
-    renderAnalytics(records, startDate);
+    document.getElementById('records-section').style.display = '';
+    renderRawRecords(analyticsDate).catch(e => console.error('renderRawRecords:', e));
+    try { renderAnalytics(records, startDate); } catch(e) { console.error('renderAnalytics:', e); }
   } else if (currentPeriod === 'week' || currentPeriod === 'month') {
     const [summary, records] = await Promise.all([
       window.api.getRangeSummary(startDate, endDate),
@@ -1811,6 +1855,7 @@ async function loadAnalytics() {
     analyticsData = summary;
     wbSection.style.display = 'none';
     document.getElementById('claude-segment-section').style.display = 'none';
+    document.getElementById('records-section').style.display = 'none';
     renderAnalytics(records, startDate);
   } else { // year
     const [summary, records] = await Promise.all([
@@ -1820,6 +1865,7 @@ async function loadAnalytics() {
     analyticsData = summary;
     wbSection.style.display = 'none';
     document.getElementById('claude-segment-section').style.display = 'none';
+    document.getElementById('records-section').style.display = 'none';
     renderAnalytics(records, startDate);
   }
 }
@@ -1995,8 +2041,8 @@ function renderClock24(records) {
     // Clamp to today
     const dayStart = new Date(start); dayStart.setHours(0,0,0,0);
     const dayEnd = new Date(dayStart); dayEnd.setHours(23,59,59,999);
-    const s = Math.max(start, dayStart);
-    const e = Math.min(end, dayEnd);
+    const s = start > dayStart ? start : dayStart;
+    const e = end < dayEnd ? end : dayEnd;
     if (e <= s) return;
 
     const sh = s.getHours() + s.getMinutes()/60 + s.getSeconds()/3600;
@@ -2383,7 +2429,7 @@ function renderAnalytics(records, startDate) {
   } else if (currentPeriod === 'year') {
     renderYearChart(records || []);
   } else {
-    renderClock24(records);
+    try { renderClock24(records); } catch(err) { console.error('renderClock24:', err); }
   }
 
   const periodDays = getPeriodDays();

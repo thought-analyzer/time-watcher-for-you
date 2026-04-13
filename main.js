@@ -676,6 +676,13 @@ function registerIPC() {
   });
 }
 
+// ── Dev mode: use separate instance lock to avoid conflict with installed version ───
+if (!app.isPackaged) {
+  app.setName('time-watcher-dev');
+  // Keep userData pointing to same location as production so data is shared
+  app.setPath('userData', app.getPath('userData').replace('time-watcher-dev', 'time-watcher-for-you'));
+}
+
 // ── Single Instance Lock ──────────────────────────────────────────────────────
 
 const gotLock = app.requestSingleInstanceLock();
