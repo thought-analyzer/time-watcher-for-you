@@ -1,0 +1,2356 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>time-watcher-for-you</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ── Themes ─────────────────────────────────────────────────────── */
+:root, [data-theme="void"] {
+  --bg:      #060606;
+  --bg2:     #101010;
+  --bg3:     #1a1a1a;
+  --bg4:     #222222;
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.14);
+  --text:    #ffffff;
+  --text2:   #666666;
+  --text3:   #3a3a3a;
+  --accent:  #e0e0e0;
+  --accent2: #aaaaaa;
+  --green:   #22c55e;
+  --red:     #ef4444;
+  --yellow:  #f59e0b;
+  --radius:  8px;
+}
+[data-theme="carbon"] {
+  --bg:      #111111;
+  --bg2:     #1a1a1a;
+  --bg3:     #222222;
+  --bg4:     #2c2c2c;
+  --border:  rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.16);
+  --text:    #f0f0f0;
+  --text2:   #606060;
+  --text3:   #383838;
+  --accent:  #d4d4d4;
+  --accent2: #909090;
+  --green:   #22c55e;
+  --red:     #ef4444;
+  --yellow:  #f59e0b;
+  --radius:  8px;
+}
+[data-theme="ash"] {
+  --bg:      #1c1c1c;
+  --bg2:     #252525;
+  --bg3:     #2e2e2e;
+  --bg4:     #383838;
+  --border:  rgba(255,255,255,0.10);
+  --border2: rgba(255,255,255,0.20);
+  --text:    #ebebeb;
+  --text2:   #707070;
+  --text3:   #484848;
+  --accent:  #cccccc;
+  --accent2: #888888;
+  --green:   #22c55e;
+  --red:     #ef4444;
+  --yellow:  #f59e0b;
+  --radius:  8px;
+}
+[data-theme="chalk"] {
+  --bg:      #f7f7f7;
+  --bg2:     #efefef;
+  --bg3:     #e6e6e6;
+  --bg4:     #dddddd;
+  --border:  rgba(0,0,0,0.09);
+  --border2: rgba(0,0,0,0.18);
+  --text:    #0a0a0a;
+  --text2:   #666666;
+  --text3:   #a8a8a8;
+  --accent:  #111111;
+  --accent2: #555555;
+  --green:   #16a34a;
+  --red:     #dc2626;
+  --yellow:  #d97706;
+  --radius:  8px;
+}
+[data-theme="forest"] {
+  --bg:      #f0fdf4;
+  --bg2:     rgba(22,163,74,0.06);
+  --bg3:     rgba(22,163,74,0.12);
+  --bg4:     rgba(22,163,74,0.18);
+  --border:  rgba(22,163,74,0.15);
+  --border2: rgba(22,163,74,0.30);
+  --text:    #052e16;
+  --text2:   #166534;
+  --text3:   #bbf7d0;
+  --accent:  #16a34a;
+  --accent2: #15803d;
+  --green:   #16a34a;
+  --red:     #dc2626;
+  --yellow:  #d97706;
+  --radius:  8px;
+}
+[data-theme="ocean"] {
+  --bg:      #f0f9ff;
+  --bg2:     rgba(2,132,199,0.06);
+  --bg3:     rgba(2,132,199,0.12);
+  --bg4:     rgba(2,132,199,0.18);
+  --border:  rgba(2,132,199,0.15);
+  --border2: rgba(2,132,199,0.30);
+  --text:    #0c4a6e;
+  --text2:   #0369a1;
+  --text3:   #bae6fd;
+  --accent:  #0284c7;
+  --accent2: #0369a1;
+  --green:   #059669;
+  --red:     #dc2626;
+  --yellow:  #d97706;
+  --radius:  8px;
+}
+[data-theme="rose"] {
+  --bg:      #fff1f6;
+  --bg2:     rgba(219,39,119,0.06);
+  --bg3:     rgba(219,39,119,0.12);
+  --bg4:     rgba(219,39,119,0.18);
+  --border:  rgba(219,39,119,0.15);
+  --border2: rgba(219,39,119,0.30);
+  --text:    #500724;
+  --text2:   #9d174d;
+  --text3:   #fbcfe8;
+  --accent:  #db2777;
+  --accent2: #be185d;
+  --green:   #059669;
+  --red:     #dc2626;
+  --yellow:  #d97706;
+  --radius:  8px;
+}
+body {
+  font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+  font-feature-settings: "cv01","ss03";
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Titlebar ─────────────────────────────────────────────────── */
+#titlebar {
+  -webkit-app-region: drag;
+  height: 36px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 10px;
+}
+#titlebar .title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text3);
+  letter-spacing: .02em;
+  flex: 1;
+}
+#titlebar .win-controls {
+  -webkit-app-region: no-drag;
+  display: flex;
+  gap: 8px;
+}
+#titlebar .win-controls button {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  border: none; cursor: pointer;
+  font-size: 0;
+  transition: opacity .15s;
+}
+#titlebar .win-controls button:hover { opacity: .8; }
+.btn-close { background: #ff5f57; }
+.btn-min   { background: #febc2e; }
+.btn-max   { background: #28c840; }
+
+/* ── Layout ───────────────────────────────────────────────────── */
+#app { display: flex; height: calc(100vh - 36px); }
+
+/* ── Sidebar ──────────────────────────────────────────────────── */
+#sidebar {
+  width: 192px;
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 12px 0;
+  gap: 2px;
+}
+.nav-item {
+  padding: 7px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  transition: color .12s, background .12s;
+  border-radius: 6px;
+  margin: 0 8px;
+}
+.nav-item:hover { background: rgba(255,255,255,.04); color: var(--text); }
+.nav-item.active {
+  background: rgba(113,112,255,.12);
+  color: var(--accent);
+}
+.nav-item .icon { font-size: 15px; opacity: .85; }
+
+/* ── Content ──────────────────────────────────────────────────── */
+#content { flex: 1; overflow-y: auto; padding: 28px 24px; }
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── Dashboard ────────────────────────────────────────────────── */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+.page-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -.3px;
+}
+.date-display { font-size: 12px; color: var(--text2); }
+
+/* Activity cards */
+.activity-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(272px, 1fr));
+  gap: 12px;
+}
+.activity-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  transition: border-color .15s, box-shadow .15s;
+  position: relative;
+  overflow: hidden;
+}
+.activity-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--card-color, transparent);
+  border-radius: var(--radius) 0 0 var(--radius);
+  opacity: 0;
+  transition: opacity .15s;
+}
+.activity-card:hover { border-color: var(--border2); box-shadow: 0 4px 16px rgba(0,0,0,.35); }
+.activity-card:hover::before { opacity: .6; }
+.activity-card.running {
+  border-color: var(--border2);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 4px 20px rgba(0,0,0,.3);
+}
+.activity-card.running::before { opacity: 1; }
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 12px;
+}
+.card-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.card-name { font-size: 13px; font-weight: 600; flex: 1; letter-spacing: -.1px; }
+.card-status {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  background: var(--bg4);
+  color: var(--accent);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.card-status.idle { background: var(--bg3); color: var(--text3); }
+
+.time-display {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -2px;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+.session-time { font-size: 11px; color: var(--text2); margin-bottom: 12px; }
+
+/* Goal bar */
+.goal-bar-wrap { margin-bottom: 12px; }
+.goal-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text2);
+  margin-bottom: 4px;
+}
+.goal-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.goal-bar-fill { height: 100%; border-radius: 2px; transition: width .5s ease; }
+
+/* Timer button */
+.timer-btn {
+  width: 100%;
+  padding: 7px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+  font-family: inherit;
+  letter-spacing: .01em;
+}
+.timer-btn.start {
+  background: rgba(16,185,129,.12);
+  color: var(--green);
+  border: 1px solid rgba(16,185,129,.25);
+}
+.timer-btn.start:hover { background: rgba(16,185,129,.22); }
+.timer-btn.stop {
+  background: rgba(248,113,113,.12);
+  color: var(--red);
+  border: 1px solid rgba(248,113,113,.25);
+}
+.timer-btn.stop:hover { background: rgba(248,113,113,.22); }
+
+/* Card footer / link btn */
+.card-footer { display: flex; gap: 6px; margin-top: 8px; }
+.link-btn {
+  flex: 1;
+  padding: 6px 0;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.02);
+  border-radius: 5px;
+  font-size: 11px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all .15s;
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  font-family: inherit;
+}
+.link-btn:hover { border-color: rgba(113,112,255,.4); color: var(--accent); background: rgba(113,112,255,.06); }
+.link-btn.linked { border-color: rgba(113,112,255,.35); color: var(--accent); background: rgba(113,112,255,.08); }
+
+/* Window capture modal */
+.capture-info {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin: 8px 0;
+}
+.capture-info .win-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+.capture-info .win-proc { font-size: 11px; color: var(--text2); }
+.capture-info .win-empty { font-size: 12px; color: var(--text2); text-align: center; padding: 8px 0; }
+.linked-patterns { margin-top: 10px; }
+.linked-patterns .lp-title { font-size: 11px; color: var(--text2); margin-bottom: 6px; }
+.lp-row {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 0; font-size: 12px;
+}
+.lp-row code {
+  flex: 1;
+  background: var(--bg3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--text2);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.lp-row .rm-btn {
+  background: none; border: none; color: var(--red);
+  cursor: pointer; font-size: 14px; padding: 0 2px;
+}
+
+/* ── Activities ───────────────────────────────────────────────── */
+.btn {
+  padding: 7px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s;
+  font-family: inherit;
+}
+.btn-primary {
+  background: var(--accent2);
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,.3);
+}
+.btn-primary:hover { background: var(--accent); }
+.btn-danger {
+  background: rgba(248,113,113,.08);
+  color: var(--red);
+  border: 1px solid rgba(248,113,113,.2);
+}
+.btn-danger:hover { background: rgba(248,113,113,.16); }
+.btn-ghost {
+  background: rgba(255,255,255,.03);
+  color: var(--text2);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { color: var(--text); background: rgba(255,255,255,.06); border-color: var(--border2); }
+
+.activity-list { display: flex; flex-direction: column; gap: 6px; }
+.activity-row {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  display: flex; align-items: center; gap: 12px;
+  transition: border-color .15s;
+}
+.activity-row:hover { border-color: var(--border2); }
+.activity-row .color-swatch { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.activity-row .name { flex: 1; font-size: 13px; font-weight: 500; }
+.activity-row .meta { font-size: 12px; color: var(--text2); }
+.activity-row .actions { display: flex; gap: 5px; }
+.icon-btn {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.02);
+  border-radius: 5px;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 12px;
+  transition: all .15s;
+  font-family: inherit;
+}
+.icon-btn:hover { color: var(--text); border-color: var(--border2); background: rgba(255,255,255,.05); }
+
+/* ── Modal ────────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.65);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+  opacity: 0; pointer-events: none;
+  transition: opacity .18s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 24px;
+  width: 420px;
+  max-width: 90vw;
+  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+}
+.modal h3 { font-size: 15px; font-weight: 600; margin-bottom: 20px; letter-spacing: -.1px; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 11px; font-weight: 500; color: var(--text2); margin-bottom: 6px; letter-spacing: .03em; text-transform: uppercase; }
+.form-group input, .form-group select {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color .15s, box-shadow .15s;
+}
+.form-group input:focus, .form-group select:focus {
+  border-color: rgba(113,112,255,.6);
+  box-shadow: 0 0 0 3px rgba(113,112,255,.1);
+}
+.form-row { display: flex; gap: 12px; }
+.form-row .form-group { flex: 1; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 24px; }
+
+/* Color picker */
+.color-options { display: flex; gap: 8px; flex-wrap: wrap; }
+.color-opt {
+  width: 22px; height: 22px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all .15s;
+}
+.color-opt.selected { border-color: rgba(255,255,255,.8); transform: scale(1.18); }
+
+/* Window patterns */
+.pattern-list { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+.pattern-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--text2);
+  background: var(--bg3);
+  padding: 4px 8px; border-radius: 4px;
+}
+.pattern-item .remove-pattern {
+  margin-left: auto; cursor: pointer; color: var(--red);
+  background: none; border: none; font-size: 14px;
+}
+
+/* ── Analytics ────────────────────────────────────────────────── */
+.analytics-controls {
+  display: flex; gap: 6px; margin-bottom: 20px;
+  flex-wrap: wrap; align-items: center;
+}
+.period-btn {
+  padding: 5px 13px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.02);
+  border-radius: 9999px;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  transition: all .15s;
+}
+.period-btn:hover { border-color: var(--border2); color: var(--text); }
+.period-btn.active {
+  background: var(--accent2);
+  border-color: var(--accent2);
+  color: #fff;
+  box-shadow: 0 1px 4px rgba(94,106,210,.4);
+}
+.chart-container {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 14px;
+}
+.chart-title {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  color: var(--text2);
+}
+
+/* Summary table */
+.summary-table { width: 100%; border-collapse: collapse; }
+.summary-table th {
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--text3);
+  border-bottom: 1px solid var(--border);
+}
+.summary-table td {
+  padding: 10px 12px;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+}
+.summary-table tr:last-child td { border-bottom: none; }
+.summary-table tr:hover td { background: rgba(255,255,255,.02); }
+
+/* ── Settings ─────────────────────────────────────────────────── */
+.settings-section { margin-bottom: 28px; }
+.settings-section h3 {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.setting-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+}
+.setting-label { font-size: 13px; font-weight: 500; }
+.setting-desc { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+/* Toggle */
+.toggle { position: relative; width: 38px; height: 20px; cursor: pointer; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-track {
+  position: absolute; inset: 0;
+  background: var(--bg4);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  transition: all .2s;
+}
+.toggle input:checked + .toggle-track { background: var(--accent2); border-color: var(--accent2); }
+.toggle-thumb {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 14px; height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform .2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,.3);
+}
+.toggle input:checked ~ .toggle-thumb { transform: translateX(18px); }
+
+/* Auto-track banner */
+.auto-track-banner {
+  background: rgba(113,112,255,.08);
+  border: 1px solid rgba(113,112,255,.2);
+  border-radius: 7px;
+  padding: 9px 14px;
+  font-size: 12px;
+  color: var(--accent);
+  margin-bottom: 16px;
+  display: none;
+}
+.auto-track-banner.visible { display: flex; align-items: center; gap: 8px; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.18); }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 60px 20px; color: var(--text2); }
+.empty-state .icon { font-size: 36px; margin-bottom: 12px; opacity: .5; }
+.empty-state p { font-size: 13px; }
+
+/* Toast */
+#toast {
+  position: fixed;
+  bottom: 20px; right: 20px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 13px;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: all .18s;
+  pointer-events: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+
+/* ── Theme swatches ──────────────────────────────────────────── */
+.theme-swatch {
+  width: 28px; height: 28px; border-radius: 7px;
+  border: 2px solid; cursor: pointer;
+  transition: transform .12s, box-shadow .12s;
+}
+.theme-swatch:hover { transform: scale(1.1); }
+.theme-swatch.active { box-shadow: 0 0 0 2px var(--text); }
+
+/* ── Setup Guide ──────────────────────────────────────────────── */
+.setup-step { display:flex; align-items:center; gap:14px; padding:12px 0; border-bottom:1px solid var(--border); }
+.setup-step:last-child { border-bottom:none; }
+.step-icon { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; }
+.step-icon.done { background:rgba(16,185,129,.15); color:var(--green); }
+.step-icon.todo { background:var(--bg4); color:var(--text3); font-size:11px; border:1px solid var(--border2); }
+.step-body { flex:1; min-width:0; }
+.step-title-row { display:flex; align-items:center; gap:8px; margin-bottom:2px; }
+.step-title { font-size:13px; font-weight:500; color:var(--text); }
+.step-title.done { color:var(--text2); }
+.step-done-badge { font-size:10px; color:var(--green); background:rgba(16,185,129,.12); padding:1px 6px; border-radius:99px; flex-shrink:0; }
+.step-desc { font-size:11px; color:var(--text3); line-height:1.5; }
+</style>
+</head>
+<body>
+
+<div id="titlebar">
+  <div class="title">⏱ time-watcher-for-you</div>
+  <div class="win-controls">
+    <button class="btn-close" onclick="window.api.minimizeToTray()" title="Hide to tray"></button>
+    <button class="btn-min" onclick="window.api.minimize()" title="Minimize"></button>
+    <button class="btn-max" onclick="window.api.maximize()" title="Maximize"></button>
+  </div>
+</div>
+
+<div id="app">
+  <div id="sidebar">
+    <div class="nav-item active" data-page="dashboard">
+      <span class="icon">⏱</span> Dashboard
+    </div>
+    <div class="nav-item" data-page="activities">
+      <span class="icon">📋</span> Activities
+    </div>
+    <div class="nav-item" data-page="analytics">
+      <span class="icon">📊</span> Analytics
+    </div>
+    <div class="nav-item" data-page="settings">
+      <span class="icon">⚙️</span> Settings
+    </div>
+  </div>
+
+  <div id="content">
+
+    <!-- ── Dashboard ─────────────────────────────────── -->
+    <div id="page-dashboard" class="page active">
+      <div class="page-header">
+        <h2>Today's Activity</h2>
+        <div class="date-display" id="today-date"></div>
+      </div>
+      <div class="auto-track-banner" id="auto-track-banner">
+        <span>🔍</span>
+        <span>Auto-tracking active — <span id="current-window-display">detecting...</span></span>
+      </div>
+      <div class="activity-grid" id="dashboard-cards">
+        <div class="empty-state">
+          <div class="icon">📋</div>
+          <p>No activities yet. Go to Activities to add some.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Activities ─────────────────────────────────── -->
+    <div id="page-activities" class="page">
+      <div class="page-header">
+        <h2>Activities</h2>
+        <button class="btn btn-primary" onclick="openActivityModal()">+ New Activity</button>
+      </div>
+      <div class="activity-list" id="activity-list">
+        <div class="empty-state">
+          <div class="icon">📋</div>
+          <p>No activities defined yet.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Analytics ─────────────────────────────────── -->
+    <div id="page-analytics" class="page">
+      <div class="page-header">
+        <h2>Analytics</h2>
+      </div>
+      <div class="analytics-controls">
+        <button class="period-btn active" data-period="day">Day</button>
+        <button class="period-btn" data-period="week">Week</button>
+        <button class="period-btn" data-period="month">Month</button>
+        <button class="period-btn" data-period="year">Year</button>
+        <input type="date" id="analytics-date" style="margin-left:auto;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--text);font-size:12px;outline:none;">
+      </div>
+      <div class="chart-container">
+        <div class="chart-title" id="chart-title">Today's breakdown</div>
+        <div id="chart-layout" style="display:flex;align-items:center;gap:28px;flex-wrap:wrap;">
+          <svg id="donut-chart" width="180" height="180" viewBox="0 0 180 180" style="flex-shrink:0;"></svg>
+          <div id="donut-legend" style="display:flex;flex-direction:column;gap:8px;flex:1;min-width:120px;"></div>
+        </div>
+      </div>
+      <div class="chart-container">
+        <div class="chart-title">Summary</div>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th>Activity</th>
+              <th>Total Time</th>
+              <th>Goal</th>
+              <th>Progress</th>
+            </tr>
+          </thead>
+          <tbody id="summary-table-body"></tbody>
+        </table>
+      </div>
+      <div class="chart-container" id="claude-segment-section" style="display:none">
+        <div class="chart-title">Claude 作業効率（自律実行 vs ユーザー操作）</div>
+        <div id="claude-segment-list"></div>
+      </div>
+      <div class="chart-container" id="window-breakdown-section" style="display:none">
+        <div class="chart-title">Window Breakdown（画面ごとの時間）</div>
+        <div id="window-breakdown-list"></div>
+      </div>
+    </div>
+
+    <!-- ── Settings ─────────────────────────────────── -->
+    <div id="page-settings" class="page">
+      <div class="page-header">
+        <h2>Settings</h2>
+      </div>
+
+      <!-- Setup Guide -->
+      <div class="settings-section" id="setup-guide-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <h3 style="margin:0;">セットアップガイド</h3>
+          <span id="setup-progress" style="font-size:12px;color:var(--text2);"></span>
+        </div>
+        <div id="setup-steps-list"></div>
+      </div>
+
+      <!-- Tracking section -->
+      <div class="settings-section">
+        <h3>Tracking</h3>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Auto Window Tracking</div>
+            <div class="setting-desc">紐づけたウィンドウが前面になると自動でタイマー開始/停止</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="setting-auto-track" onchange="toggleAutoTrack(this.checked)">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Idle Detection（アイドル自動ポーズ）</div>
+            <div class="setting-desc">マウス/キーボード無操作が続くとタイマーを自動ポーズ</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="setting-idle" onchange="toggleIdle(this.checked)">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <div class="setting-row" id="idle-threshold-row" style="display:none">
+          <div>
+            <div class="setting-label">アイドル判定時間</div>
+            <div class="setting-desc">この時間操作なしでタイマーをポーズ</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <input type="range" id="idle-threshold-slider" min="1" max="30" value="3"
+              style="width:100px;accent-color:var(--accent);"
+              oninput="updateIdleThreshold(this.value)">
+            <span id="idle-threshold-label" style="font-size:13px;min-width:40px;">3分</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Claude Code section -->
+      <div class="settings-section">
+        <h3>Claude Code Integration</h3>
+        <div id="claude-hook-status" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:14px;font-size:12px;color:var(--text2);">
+          Loading...
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Claude Code Hookを設定する</div>
+            <div class="setting-desc">~/.claude/settings.json にhookを自動追記します</div>
+          </div>
+          <button class="btn btn-primary" style="font-size:12px;padding:6px 14px;" onclick="applyClaudeHooks()">
+            Apply Hooks
+          </button>
+        </div>
+        <div id="claude-segment-display" style="margin-top:10px;font-size:12px;color:var(--text2);display:none">
+          現在のセグメント: <strong id="claude-segment-value">—</strong>
+        </div>
+      </div>
+
+      <!-- Display section -->
+      <div class="settings-section">
+        <h3>Display</h3>
+        <div class="setting-row" style="align-items:flex-start;">
+          <div>
+            <div class="setting-label">テーマ</div>
+            <div class="setting-desc">アプリとオーバーレイに適用されます</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-shrink:0;">
+            <button class="theme-swatch" data-theme="void"   onclick="setTheme('void')"   title="Void"   style="background:#060606;border-color:#444;"></button>
+            <button class="theme-swatch" data-theme="chalk"  onclick="setTheme('chalk')"  title="Chalk"  style="background:#f7f7f7;border-color:#ccc;"></button>
+            <button class="theme-swatch" data-theme="forest" onclick="setTheme('forest')" title="Forest" style="background:#d1fae5;border-color:#16a34a;"></button>
+            <button class="theme-swatch" data-theme="ocean"  onclick="setTheme('ocean')"  title="Ocean"  style="background:#bae6fd;border-color:#0284c7;"></button>
+            <button class="theme-swatch" data-theme="rose"   onclick="setTheme('rose')"   title="Rose"   style="background:#fbcfe8;border-color:#db2777;"></button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Show Overlay</div>
+            <div class="setting-desc">常時表示タイマーウィンドウ</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="setting-overlay" checked onchange="toggleOverlay(this.checked)">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">ログイン時に自動起動</div>
+            <div class="setting-desc">Windows起動時にアプリをトレイに常駐させます</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="setting-login" onchange="toggleLoginItem(this.checked)">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">目標通知</div>
+            <div class="setting-desc">目標達成・上限超過時にデスクトップ通知を表示</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="setting-notify" onchange="toggleNotify(this.checked)">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Data section -->
+      <div class="settings-section">
+        <h3>Data</h3>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">データをエクスポート</div>
+            <div class="setting-desc">全活動・全記録をJSONファイルに保存します</div>
+          </div>
+          <button class="btn btn-ghost" style="font-size:12px;padding:6px 14px;" onclick="exportData()">
+            Export JSON
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /app -->
+
+<!-- Activity Modal -->
+<div class="modal-overlay" id="activity-modal">
+  <div class="modal">
+    <h3 id="modal-title">New Activity</h3>
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" id="input-name" placeholder="e.g. Coding, Meeting, Reading">
+    </div>
+    <div class="form-group">
+      <label>Color</label>
+      <div class="color-options" id="color-options"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Goal Type</label>
+        <select id="input-goal-type">
+          <option value="none">No goal</option>
+          <option value="min">Minimum (at least)</option>
+          <option value="max">Maximum (at most)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Goal（1日の目標）</label>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <input type="number" id="input-goal-h" placeholder="0" min="0" style="width:64px;">
+          <span style="font-size:13px;color:var(--text2)">h</span>
+          <input type="number" id="input-goal-m" placeholder="0" min="0" max="59" style="width:64px;">
+          <span style="font-size:13px;color:var(--text2)">min / day</span>
+        </div>
+      </div>
+    </div>
+    <div class="form-group" id="window-patterns-group">
+      <label>Window Patterns (for auto-tracking, regex)</label>
+      <div style="display:flex;gap:6px;">
+        <input type="text" id="input-pattern" placeholder="e.g. Visual Studio|code.exe">
+        <button class="btn btn-ghost" onclick="addPattern()" style="white-space:nowrap;">Add</button>
+      </div>
+      <div class="pattern-list" id="pattern-list"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeActivityModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveActivity()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Window Link Modal -->
+<div class="modal-overlay" id="window-link-modal">
+  <div class="modal" style="width:480px;">
+    <h3>Link Window to Activity</h3>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px;">
+      このアプリを使っている間も検出は続いています。下のリストから選んで紐づけてください。
+    </p>
+
+    <div style="font-size:12px;color:var(--text2);margin-bottom:6px;">最近使ったウィンドウ:</div>
+    <div id="recent-windows-list" style="display:flex;flex-direction:column;gap:4px;max-height:240px;overflow-y:auto;margin-bottom:14px;">
+      <div style="font-size:12px;color:var(--text2);padding:8px;text-align:center;">Auto Trackをオンにして他のアプリを使うと、ここに表示されます</div>
+    </div>
+
+    <div class="form-group">
+      <label>手動でパターンを追加 (テキストまたは正規表現)</label>
+      <div style="display:flex;gap:6px;">
+        <input type="text" id="manual-pattern-input" placeholder="例: chrome  /  Code  /  claude">
+        <button class="btn btn-ghost" onclick="addManualPattern()" style="white-space:nowrap;font-size:12px;">追加</button>
+      </div>
+    </div>
+
+    <div class="linked-patterns" id="linked-patterns-view"></div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeWindowLinkModal()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- Alias Edit Modal -->
+<div class="modal-overlay" id="alias-modal">
+  <div class="modal" style="width:400px;">
+    <h3>表示名を変更</h3>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:12px;word-break:break-all;padding:6px 8px;background:var(--bg3);border-radius:6px;" id="alias-modal-original"></div>
+    <div class="form-group">
+      <label>表示名（空欄でリセット）</label>
+      <input type="text" id="alias-modal-input" placeholder="表示名を入力..."
+        onkeydown="if(event.key==='Enter')confirmAliasEdit();if(event.key==='Escape')closeAliasModal();">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeAliasModal()">キャンセル</button>
+      <button class="btn btn-primary" onclick="confirmAliasEdit()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── State ────────────────────────────────────────────────────────────────────
+let activities = [];
+let timerState = { timers: [], timestamp: 0 };
+let currentPage = 'dashboard';
+let editingActivityId = null;
+let modalPatterns = [];
+let selectedColor = '#7c7cff';
+let analyticsData = null;
+let currentPeriod = 'day';
+let analyticsDate = new Date().toISOString().slice(0, 10);
+let windowAliases = {}; // { originalTitle: displayName }
+
+const COLORS = [
+  '#7c7cff', '#4ade80', '#f87171', '#fbbf24', '#60a5fa',
+  '#e879f9', '#34d399', '#fb923c', '#a78bfa', '#f472b6',
+];
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+async function init() {
+  setupNav();
+  setupColorOptions();
+  document.getElementById('today-date').textContent = new Date().toLocaleDateString('ja-JP', {
+    year: 'numeric', month: 'long', day: 'numeric', weekday: 'short'
+  });
+  document.getElementById('analytics-date').value = analyticsDate;
+  document.getElementById('analytics-date').addEventListener('change', (e) => {
+    analyticsDate = e.target.value;
+    loadAnalytics();
+  });
+
+  activities = await window.api.getActivities();
+  timerState = await window.api.getActiveTimers();
+
+  await initSettings();
+  renderDashboard();
+  renderActivityList();
+
+  // Listen for timer ticks
+  window.api.on('timer:tick', (state) => {
+    timerState = state;
+    if (currentPage === 'dashboard') renderDashboard();
+  });
+
+  // Listen for window changes
+  window.api.on('tracker:windowChange', (info) => {
+    document.getElementById('current-window-display').textContent =
+      `${info.title} (${info.processName})`;
+  });
+
+  window.api.on('timer:autoStarted', async ({ activityId }) => {
+    timerState = await window.api.getActiveTimers();
+    renderDashboard();
+  });
+
+  window.api.on('idle:started', ({ idleSeconds }) => {
+    showToast(`⏸ アイドル検知 — タイマーをポーズしました`);
+    timerState.timers.forEach(t => { if (t.isRunning) t.isRunning = false; });
+    renderDashboard();
+  });
+
+  window.api.on('idle:ended', ({ resumedCount }) => {
+    if (resumedCount > 0) showToast(`▶ 操作再開 — ${resumedCount}件のタイマーを再開しました`);
+  });
+
+  window.api.on('claude:hookEvent', (payload) => {
+    // Update Claude segment display in settings
+    const seg = payload.segment;
+    const segEl = document.getElementById('claude-segment-display');
+    const segVal = document.getElementById('claude-segment-value');
+    if (segEl && segVal) {
+      segEl.style.display = 'block';
+      const label = seg === 'claude' ? '🤖 Claude自律実行中' : '👤 ユーザー操作中';
+      const color = seg === 'claude' ? 'var(--accent)' : 'var(--green)';
+      segVal.style.color = color;
+      segVal.textContent = label;
+    }
+  });
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function setupNav() {
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const page = item.dataset.page;
+      navigateTo(page);
+    });
+  });
+}
+
+function navigateTo(page) {
+  currentPage = page;
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.toggle('active', i.dataset.page === page));
+  document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === `page-${page}`));
+  if (page === 'analytics') loadAnalytics();
+  if (page === 'activities') renderActivityList();
+}
+
+// ── Dashboard ─────────────────────────────────────────────────────────────────
+function renderDashboard() {
+  const container = document.getElementById('dashboard-cards');
+  if (!activities.length) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">📋</div><p>No activities yet. Go to Activities to add some.</p></div>`;
+    return;
+  }
+
+  const html = activities.map(activity => {
+    const timer = timerState.timers.find(t => t.activityId === activity.id) || {
+      isRunning: false, todaySeconds: 0, sessionSeconds: 0,
+      goalMinutes: activity.goalMinutes, goalType: activity.goalType,
+      color: activity.color,
+    };
+    return buildCard(activity, timer);
+  }).join('');
+  container.innerHTML = html;
+}
+
+function buildCard(activity, timer) {
+  const { isRunning, todaySeconds, sessionSeconds, goalMinutes, goalType } = timer;
+  const todayStr = formatTime(todaySeconds);
+  const sessionStr = isRunning ? `+${formatTime(sessionSeconds)} this session` : 'Idle';
+
+  let goalBar = '';
+  if (goalMinutes > 0 && goalType !== 'none') {
+    const goalSeconds = goalMinutes * 60;
+    const pct = Math.min(100, (todaySeconds / goalSeconds) * 100);
+    const remaining = goalSeconds - todaySeconds;
+    const isOver = remaining <= 0;
+    const barColor = goalType === 'max'
+      ? (isOver ? 'var(--red)' : 'var(--accent)')
+      : (isOver ? 'var(--green)' : 'var(--yellow)');
+    const remainingStr = isOver
+      ? `+${formatTime(Math.abs(remaining))} over`
+      : `${formatTime(remaining)} ${goalType === 'min' ? 'to go' : 'left'}`;
+    goalBar = `
+      <div class="goal-bar-wrap">
+        <div class="goal-bar-label">
+          <span>${goalType === 'min' ? 'Min goal' : 'Max limit'}: ${goalMinutes}m</span>
+          <span style="color:${barColor}">${remainingStr}</span>
+        </div>
+        <div class="goal-bar">
+          <div class="goal-bar-fill" style="width:${pct}%;background:${barColor}"></div>
+        </div>
+      </div>`;
+  }
+
+  const hasPatterns = activity.windowPatterns && activity.windowPatterns.length > 0;
+
+  const linkBtn = `<button class="link-btn ${hasPatterns ? 'linked' : ''}" onclick="openWindowLinkModal('${activity.id}')" title="Manage window links">
+      🔗 ${hasPatterns ? `${activity.windowPatterns.length} window linked` : 'Link window'}
+    </button>`;
+
+  return `
+  <div class="activity-card ${isRunning ? 'running' : ''}" style="--card-color:${activity.color}">
+    <div class="card-header">
+      <div class="card-dot" style="background:${activity.color}"></div>
+      <div class="card-name">${esc(activity.name)}</div>
+      <div class="card-status ${isRunning ? '' : 'idle'}">${isRunning ? '● REC' : 'idle'}</div>
+    </div>
+    <div class="time-display">${todayStr}</div>
+    <div class="session-time">${sessionStr}</div>
+    ${goalBar}
+    <button class="timer-btn ${isRunning ? 'stop' : 'start'}" onclick="toggleTimer('${activity.id}', ${isRunning})">
+      ${isRunning ? '⏹ Stop' : '▶ Start'}
+    </button>
+    <div class="card-footer">${linkBtn}</div>
+  </div>`;
+}
+
+async function toggleTimer(activityId, isRunning) {
+  if (isRunning) {
+    timerState = await window.api.stopTimer(activityId);
+  } else {
+    timerState = await window.api.startTimer(activityId);
+  }
+  renderDashboard();
+}
+
+// ── Activity List ─────────────────────────────────────────────────────────────
+function renderActivityList() {
+  const container = document.getElementById('activity-list');
+  if (!activities.length) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">📋</div><p>No activities defined yet.</p></div>`;
+    return;
+  }
+  container.innerHTML = activities.map(a => {
+    const goalStr = a.goalMinutes > 0 && a.goalType !== 'none'
+      ? `${a.goalType === 'min' ? 'Min' : 'Max'}: ${a.goalMinutes}m`
+      : 'No goal';
+    const patternsStr = a.windowPatterns && a.windowPatterns.length
+      ? `${a.windowPatterns.length} window pattern(s)` : 'No auto-tracking';
+    return `
+    <div class="activity-row">
+      <div class="color-swatch" style="background:${a.color}"></div>
+      <div class="name">${esc(a.name)}</div>
+      <div class="meta">${goalStr} · ${patternsStr}</div>
+      <div class="actions">
+        <button class="icon-btn" onclick="editActivity('${a.id}')">Edit</button>
+        <button class="icon-btn" style="color:var(--red)" onclick="deleteActivity('${a.id}')">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Activity Modal ────────────────────────────────────────────────────────────
+function setupColorOptions() {
+  const container = document.getElementById('color-options');
+  container.innerHTML = COLORS.map(c => `
+    <div class="color-opt ${c === selectedColor ? 'selected' : ''}"
+         style="background:${c}"
+         onclick="selectColor('${c}')"></div>
+  `).join('');
+}
+
+function selectColor(color) {
+  selectedColor = color;
+  document.querySelectorAll('.color-opt').forEach(el => {
+    el.classList.toggle('selected', el.style.background === color || el.style.backgroundColor === color);
+  });
+}
+
+function openActivityModal(activity = null) {
+  editingActivityId = activity ? activity.id : null;
+  modalPatterns = activity ? [...(activity.windowPatterns || [])] : [];
+  selectedColor = activity ? activity.color : COLORS[0];
+
+  document.getElementById('modal-title').textContent = activity ? 'Edit Activity' : 'New Activity';
+  document.getElementById('input-name').value = activity ? activity.name : '';
+  document.getElementById('input-goal-type').value = activity ? (activity.goalType || 'none') : 'none';
+  const gm = activity ? (activity.goalMinutes || 0) : 0;
+  document.getElementById('input-goal-h').value = Math.floor(gm / 60) || '';
+  document.getElementById('input-goal-m').value = (gm % 60) || '';
+  document.getElementById('input-pattern').value = '';
+
+  setupColorOptions();
+  renderModalPatterns();
+
+  document.getElementById('activity-modal').classList.add('open');
+  document.getElementById('input-name').focus();
+}
+
+function closeActivityModal() {
+  document.getElementById('activity-modal').classList.remove('open');
+  editingActivityId = null;
+}
+
+function addPattern() {
+  const val = document.getElementById('input-pattern').value.trim();
+  if (!val) return;
+  if (!modalPatterns.includes(val)) modalPatterns.push(val);
+  document.getElementById('input-pattern').value = '';
+  renderModalPatterns();
+}
+
+function removePattern(idx) {
+  modalPatterns.splice(idx, 1);
+  renderModalPatterns();
+}
+
+function renderModalPatterns() {
+  const container = document.getElementById('pattern-list');
+  if (!modalPatterns.length) { container.innerHTML = ''; return; }
+  container.innerHTML = modalPatterns.map((p, i) => `
+    <div class="pattern-item">
+      <code>${esc(p)}</code>
+      <button class="remove-pattern" onclick="removePattern(${i})">×</button>
+    </div>
+  `).join('');
+}
+
+async function saveActivity() {
+  const name = document.getElementById('input-name').value.trim();
+  if (!name) { showToast('Name is required'); return; }
+  const goalType = document.getElementById('input-goal-type').value;
+  const goalH = parseInt(document.getElementById('input-goal-h').value) || 0;
+  const goalM = parseInt(document.getElementById('input-goal-m').value) || 0;
+  const goalMinutes = goalH * 60 + goalM;
+
+  const data = { name, color: selectedColor, goalType, goalMinutes, windowPatterns: [...modalPatterns] };
+
+  if (editingActivityId) {
+    await window.api.updateActivity(editingActivityId, data);
+  } else {
+    await window.api.createActivity(data);
+  }
+  activities = await window.api.getActivities();
+  closeActivityModal();
+  renderActivityList();
+  if (currentPage === 'dashboard') renderDashboard();
+  showToast(editingActivityId ? 'Activity updated' : 'Activity created');
+  refreshSetupGuide();
+}
+
+function editActivity(id) {
+  const a = activities.find(x => x.id === id);
+  if (a) openActivityModal(a);
+}
+
+async function deleteActivity(id) {
+  if (!confirm('Delete this activity?')) return;
+  await window.api.deleteActivity(id);
+  activities = await window.api.getActivities();
+  renderActivityList();
+  renderDashboard();
+  showToast('Activity deleted');
+}
+
+// ── Window Link Modal ─────────────────────────────────────────────────────────
+
+let windowLinkActivityId = null;
+let windowLinkRefreshTimer = null;
+
+async function openWindowLinkModal(activityId) {
+  windowLinkActivityId = activityId;
+  document.getElementById('window-link-modal').classList.add('open');
+  document.getElementById('manual-pattern-input').value = '';
+  await refreshWindowLinkModal();
+
+  // Refresh current window every 2s while modal is open
+  windowLinkRefreshTimer = setInterval(refreshWindowLinkModal, 2000);
+}
+
+async function refreshWindowLinkModal() {
+  const activity = activities.find(a => a.id === windowLinkActivityId);
+  if (!activity) return;
+
+  const [recentWindows, currentWin] = await Promise.all([
+    window.api.getRecentWindows(),
+    window.api.getCurrentWindow(),
+  ]);
+  const patterns = activity.windowPatterns || [];
+  const container = document.getElementById('recent-windows-list');
+
+  // Build window list: currentWin first (deduplicated), then recent history
+  const allWindows = [];
+  if (currentWin && currentWin.title) {
+    allWindows.push({ ...currentWin, isCurrent: true });
+  }
+  for (const w of (recentWindows || [])) {
+    if (!allWindows.some(x => x.processName === w.processName && x.title === w.title)) {
+      allWindows.push(w);
+    }
+  }
+
+  if (!allWindows.length) {
+    const autoOn = document.getElementById('setting-auto-track').checked;
+    container.innerHTML = autoOn
+      ? `<div style="font-size:12px;color:var(--text2);padding:10px;background:var(--bg3);border-radius:6px;line-height:1.7">
+          <strong style="color:var(--yellow)">⚠ ウィンドウ未検出</strong><br>
+          1. このモーダルを閉じる<br>
+          2. 追跡したいアプリ（Chrome、ターミナル等）を前面に出す<br>
+          3. time-watcherに戻って再度クリック
+        </div>`
+      : `<div style="font-size:12px;color:var(--text2);padding:10px;background:var(--bg3);border-radius:6px">
+          <strong style="color:var(--red)">Auto Track がOFFです</strong><br>
+          Settings → Auto Window Tracking をONにしてください
+        </div>`;
+  } else {
+    container.innerHTML = allWindows.map(win => {
+      const isLinked = patterns.some(p => {
+        try { return new RegExp(p, 'i').test(win.title) || new RegExp(p, 'i').test(win.processName); }
+        catch { return false; }
+      });
+      const linkedBadge = isLinked
+        ? `<span style="font-size:10px;color:var(--green);margin-left:auto;white-space:nowrap;">✓ リンク済</span>`
+        : '';
+      const currentBadge = win.isCurrent
+        ? `<span style="font-size:10px;color:var(--yellow);margin-left:4px;white-space:nowrap;">★ 現在</span>`
+        : '';
+      return `
+      <div style="background:var(--bg3);border:1px solid ${isLinked ? 'rgba(74,222,128,.3)' : win.isCurrent ? 'rgba(251,191,36,.3)' : 'var(--border)'};border-radius:7px;padding:8px 10px;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+          <span style="font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(win.title)}">${esc(win.title.slice(0,50))}${win.title.length>50?'…':''}</span>
+          ${currentBadge}${linkedBadge}
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <code style="font-size:11px;color:var(--text2);background:var(--bg2);padding:1px 6px;border-radius:3px;">${esc(win.processName)}</code>
+          <div style="margin-left:auto;display:flex;gap:5px;">
+            <button class="btn btn-ghost" style="font-size:11px;padding:3px 8px;" onclick="linkFromHistory('process','${esc(win.processName)}')">
+              プロセス名で紐づけ
+            </button>
+            <button class="btn btn-ghost" style="font-size:11px;padding:3px 8px;" onclick="linkFromHistory('title','${esc(win.title.replace(/'/g,"\\'"))}')">
+              タイトルで紐づけ
+            </button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  renderLinkedPatterns(activity);
+}
+
+function renderLinkedPatterns(activity) {
+  const container = document.getElementById('linked-patterns-view');
+  const patterns = activity.windowPatterns || [];
+  if (!patterns.length) {
+    container.innerHTML = `<div class="lp-title" style="margin-top:10px">紐づけなし — ウィンドウを検出して追加してください</div>`;
+    return;
+  }
+  container.innerHTML = `
+    <div class="linked-patterns">
+      <div class="lp-title">紐づけ済みパターン (${patterns.length})</div>
+      ${patterns.map((p, i) => `
+        <div class="lp-row">
+          <code title="${esc(p)}">${esc(p)}</code>
+          <button class="rm-btn" onclick="removePattern_link(${i})" title="削除">×</button>
+        </div>
+      `).join('')}
+    </div>`;
+}
+
+async function linkFromHistory(type, value) {
+  // Escape regex special chars for literal matching
+  const pattern = value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  await window.api.linkActivityToWindow(windowLinkActivityId, pattern);
+  activities = await window.api.getActivities();
+  renderDashboard();
+  showToast('ウィンドウを紐づけました');
+  await refreshWindowLinkModal();
+}
+
+async function addManualPattern() {
+  const val = document.getElementById('manual-pattern-input').value.trim();
+  if (!val) return;
+  await window.api.linkActivityToWindow(windowLinkActivityId, val);
+  activities = await window.api.getActivities();
+  const activity = activities.find(a => a.id === windowLinkActivityId);
+  renderLinkedPatterns(activity);
+  renderDashboard();
+  document.getElementById('manual-pattern-input').value = '';
+  showToast('パターンを追加しました');
+}
+
+async function removePattern_link(idx) {
+  const activity = activities.find(a => a.id === windowLinkActivityId);
+  if (!activity) return;
+  const pattern = (activity.windowPatterns || [])[idx];
+  if (!pattern) return;
+  await window.api.unlinkActivityFromWindow(windowLinkActivityId, pattern);
+  activities = await window.api.getActivities();
+  const updated = activities.find(a => a.id === windowLinkActivityId);
+  renderLinkedPatterns(updated);
+  renderDashboard();
+  showToast('パターンを削除しました');
+}
+
+function closeWindowLinkModal() {
+  document.getElementById('window-link-modal').classList.remove('open');
+  windowLinkActivityId = null;
+  if (windowLinkRefreshTimer) {
+    clearInterval(windowLinkRefreshTimer);
+    windowLinkRefreshTimer = null;
+  }
+}
+
+// ── Analytics ─────────────────────────────────────────────────────────────────
+async function loadAnalytics() {
+  const date = new Date(analyticsDate);
+  let startDate, endDate, title;
+
+  if (currentPeriod === 'day') {
+    startDate = analyticsDate;
+    endDate = analyticsDate;
+    title = `${date.toLocaleDateString('ja-JP', { year:'numeric', month:'long', day:'numeric' })}`;
+  } else if (currentPeriod === 'week') {
+    const d = new Date(date);
+    const dow = d.getDay();
+    const mon = new Date(d); mon.setDate(d.getDate() - dow + (dow === 0 ? -6 : 1));
+    const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+    startDate = mon.toISOString().slice(0, 10);
+    endDate = sun.toISOString().slice(0, 10);
+    title = `Week of ${mon.toLocaleDateString('ja-JP', { month:'long', day:'numeric' })}`;
+  } else if (currentPeriod === 'month') {
+    startDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-01`;
+    const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    endDate = lastDay.toISOString().slice(0, 10);
+    title = date.toLocaleDateString('ja-JP', { year:'numeric', month:'long' });
+  } else { // year
+    startDate = `${date.getFullYear()}-01-01`;
+    endDate = `${date.getFullYear()}-12-31`;
+    title = `${date.getFullYear()}年`;
+  }
+
+  document.getElementById('chart-title').textContent = title;
+
+  const wbSection = document.getElementById('window-breakdown-section');
+  if (currentPeriod === 'day') {
+    const [summary, records, wb, claudeSeg] = await Promise.all([
+      window.api.getRangeSummary(startDate, endDate),
+      window.api.getRecordsForDate(analyticsDate),
+      window.api.getWindowBreakdown(analyticsDate),
+      window.api.getClaudeSegmentBreakdown(analyticsDate),
+    ]);
+    analyticsData = summary;
+    renderWindowBreakdown(wb);
+    renderClaudeSegment(claudeSeg);
+    wbSection.style.display = '';
+    renderAnalytics(records, startDate);
+  } else if (currentPeriod === 'week' || currentPeriod === 'month') {
+    const [summary, records] = await Promise.all([
+      window.api.getRangeSummary(startDate, endDate),
+      window.api.getRecordsForRange(startDate, endDate),
+    ]);
+    analyticsData = summary;
+    wbSection.style.display = 'none';
+    document.getElementById('claude-segment-section').style.display = 'none';
+    renderAnalytics(records, startDate);
+  } else { // year
+    const [summary, records] = await Promise.all([
+      window.api.getRangeSummary(startDate, endDate),
+      window.api.getRecordsForRange(startDate, endDate),
+    ]);
+    analyticsData = summary;
+    wbSection.style.display = 'none';
+    document.getElementById('claude-segment-section').style.display = 'none';
+    renderAnalytics(records, startDate);
+  }
+}
+
+function renderClaudeSegment(segData) {
+  const section = document.getElementById('claude-segment-section');
+  const container = document.getElementById('claude-segment-list');
+  const entries = Object.entries(segData);
+  if (!entries.length) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = '';
+  container.innerHTML = entries.map(([activityId, { claudeSeconds, userSeconds }]) => {
+    const a = activities.find(x => x.id === activityId);
+    if (!a) return '';
+    const total = claudeSeconds + userSeconds;
+    if (total === 0) return '';
+    const claudePct = Math.round((claudeSeconds / total) * 100);
+    const userPct = 100 - claudePct;
+    return `
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${a.color};"></span>
+        <span style="font-size:13px;font-weight:600;">${esc(a.name)}</span>
+        <span style="font-size:11px;color:var(--text2);margin-left:auto;">合計 ${formatTime(total)}</span>
+      </div>
+      <div style="display:flex;height:18px;border-radius:4px;overflow:hidden;background:var(--bg3);">
+        <div style="width:${claudePct}%;background:var(--accent);transition:width .4s;" title="Claude自律: ${formatTime(claudeSeconds)}"></div>
+        <div style="width:${userPct}%;background:var(--green);opacity:0.7;transition:width .4s;" title="ユーザー操作: ${formatTime(userSeconds)}"></div>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:4px;font-size:11px;">
+        <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--accent);margin-right:4px;"></span>Claude自律 ${formatTime(claudeSeconds)} <span style="color:var(--accent)">${claudePct}%</span></span>
+        <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--green);margin-right:4px;opacity:0.7;"></span>ユーザー操作 ${formatTime(userSeconds)} <span style="color:var(--green)">${userPct}%</span></span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderWindowBreakdown(wb) {
+  const container = document.getElementById('window-breakdown-list');
+  const entries = Object.entries(wb).sort((a, b) => b[1] - a[1]);
+  if (!entries.length) {
+    container.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:10px">データなし（Auto Trackでウィンドウを計測するとここに表示されます）</div>';
+    return;
+  }
+  const total = entries.reduce((s, [, v]) => s + v, 0);
+  const maxSec = entries[0][1];
+  container.innerHTML = entries.map(([title, secs]) => {
+    const alias = windowAliases[title] || '';
+    const displayName = alias || title;
+    const pct = Math.round((secs / total) * 100);
+    const barW = Math.round((secs / maxSec) * 100);
+    const escapedTitle = esc(title);
+    const escapedAlias = esc(alias);
+    return `
+    <div style="margin-bottom:12px;" data-wbtitle="${escapedTitle}">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+        <span style="color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;font-size:12px;" title="${escapedTitle}">${esc(displayName.length > 55 ? displayName.slice(0,55)+'…' : displayName)}</span>
+        <span style="color:var(--text2);white-space:nowrap;font-size:12px;">${formatTime(secs)} <span style="color:var(--accent)">${pct}%</span></span>
+        <button data-title="${escapedTitle}" onclick="editWindowAlias(this.dataset.title)" style="background:none;border:1px solid var(--border);border-radius:4px;color:var(--text2);font-size:10px;padding:1px 6px;cursor:pointer;" title="表示名を変更">✏</button>
+      </div>
+      <div style="background:var(--bg3);border-radius:3px;height:5px;">
+        <div style="background:var(--accent);height:5px;border-radius:3px;width:${barW}%;transition:width .3s;"></div>
+      </div>
+      ${alias ? `<div style="font-size:10px;color:var(--text2);margin-top:2px;">元: ${escapedTitle.length>50?escapedTitle.slice(0,50)+'…':escapedTitle}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+let aliasEditTitle = null;
+
+function editWindowAlias(originalTitle) {
+  aliasEditTitle = originalTitle;
+  document.getElementById('alias-modal-original').textContent = originalTitle;
+  document.getElementById('alias-modal-input').value = windowAliases[originalTitle] || '';
+  document.getElementById('alias-modal').classList.add('open');
+  setTimeout(() => document.getElementById('alias-modal-input').focus(), 50);
+}
+
+function closeAliasModal() {
+  document.getElementById('alias-modal').classList.remove('open');
+  aliasEditTitle = null;
+}
+
+async function confirmAliasEdit() {
+  if (aliasEditTitle === null) return;
+  const input = document.getElementById('alias-modal-input').value.trim();
+  if (input) {
+    windowAliases[aliasEditTitle] = input;
+  } else {
+    delete windowAliases[aliasEditTitle];
+  }
+  closeAliasModal();
+  await window.api.setSettings({ windowAliases });
+  const wb = await window.api.getWindowBreakdown(analyticsDate);
+  renderWindowBreakdown(wb);
+}
+
+function getPeriodDays() {
+  const d = new Date(analyticsDate);
+  if (currentPeriod === 'day')   return 1;
+  if (currentPeriod === 'week')  return 7;
+  if (currentPeriod === 'month') return new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  if (currentPeriod === 'year')  { const y = d.getFullYear(); return ((y%4===0&&y%100!==0)||y%400===0)?366:365; }
+  return 1;
+}
+
+function fmtGoal(goalMinutes) {
+  const h = Math.floor(goalMinutes / 60);
+  const m = goalMinutes % 60;
+  if (h > 0 && m > 0) return `${h}h ${m}min`;
+  if (h > 0) return `${h}h`;
+  return `${m}min`;
+}
+
+function renderClock24(records) {
+  const svg = document.getElementById('donut-chart');
+  const legend = document.getElementById('donut-legend');
+  svg.setAttribute('width', '180');
+  svg.setAttribute('height', '180');
+  svg.setAttribute('viewBox', '0 0 180 180');
+  const layout = document.getElementById('chart-layout');
+  layout.style.flexDirection = 'row';
+  layout.style.alignItems = 'center';
+  legend.style.flex = '1';
+  const cx = 90, cy = 90, ro = 78, ri = 52;
+
+  // Helper: time → angle in radians (0h = top = -π/2, clockwise)
+  function toAngle(h, m) {
+    return ((h + m / 60) / 24) * 2 * Math.PI - Math.PI / 2;
+  }
+  function polar(r, angle) {
+    return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
+  }
+  function arcPath(r, a1, a2) {
+    const p1 = polar(r, a1), p2 = polar(r, a2);
+    const large = (a2 - a1 + 2 * Math.PI) % (2 * Math.PI) > Math.PI ? 1 : 0;
+    return `${p1.x.toFixed(2)},${p1.y.toFixed(2)} A${r},${r} 0 ${large} 1 ${p2.x.toFixed(2)},${p2.y.toFixed(2)}`;
+  }
+
+  // Background ring
+  let out = `<circle cx="${cx}" cy="${cy}" r="${(ro+ri)/2}" fill="none" stroke="#1e1e2a" stroke-width="${ro-ri}"/>`;
+
+  // Hour ticks
+  for (let h = 0; h < 24; h++) {
+    const a = toAngle(h, 0);
+    const isMajor = h % 6 === 0;
+    const r1 = isMajor ? ri - 6 : ri - 3;
+    const r2 = ro + (isMajor ? 6 : 3);
+    const p1 = polar(r1, a), p2 = polar(r2, a);
+    out += `<line x1="${p1.x.toFixed(1)}" y1="${p1.y.toFixed(1)}" x2="${p2.x.toFixed(1)}" y2="${p2.y.toFixed(1)}"
+      stroke="${isMajor ? '#3a3a5a' : '#252535'}" stroke-width="${isMajor ? 1.5 : 0.8}"/>`;
+  }
+
+  // Hour labels: 0, 6, 12, 18
+  const labelR = ri - 14;
+  [[0,'0'], [6,'6'], [12,'12'], [18,'18']].forEach(([h, lbl]) => {
+    const a = toAngle(h, 0);
+    const p = polar(labelR, a);
+    out += `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" text-anchor="middle" dominant-baseline="middle"
+      fill="#44446a" font-size="9" font-weight="600">${lbl}</text>`;
+  });
+
+  // Activity arcs
+  const totalByActivity = {};
+  (records || []).forEach(r => {
+    const start = new Date(r.startTime);
+    const end = r.endTime ? new Date(r.endTime) : new Date();
+    const a = activities.find(x => x.id === r.activityId);
+    if (!a) return;
+
+    // Clamp to today
+    const dayStart = new Date(start); dayStart.setHours(0,0,0,0);
+    const dayEnd = new Date(dayStart); dayEnd.setHours(23,59,59,999);
+    const s = Math.max(start, dayStart);
+    const e = Math.min(end, dayEnd);
+    if (e <= s) return;
+
+    const sh = s.getHours() + s.getMinutes()/60 + s.getSeconds()/3600;
+    const eh = e.getHours() + e.getMinutes()/60 + e.getSeconds()/3600;
+    const a1 = toAngle(0, sh * 60);
+    const a2 = toAngle(0, eh * 60);
+    if (Math.abs(a2 - a1) < 0.001) return;
+
+    const p1o = polar(ro, a1), p2o = polar(ro, a2);
+    const p1i = polar(ri, a1), p2i = polar(ri, a2);
+    const large = (a2 - a1 + 2 * Math.PI) % (2 * Math.PI) > Math.PI ? 1 : 0;
+    out += `<path d="M${p1o.x.toFixed(2)},${p1o.y.toFixed(2)} A${ro},${ro} 0 ${large} 1 ${p2o.x.toFixed(2)},${p2o.y.toFixed(2)}
+      L${p2i.x.toFixed(2)},${p2i.y.toFixed(2)} A${ri},${ri} 0 ${large} 0 ${p1i.x.toFixed(2)},${p1i.y.toFixed(2)} Z"
+      fill="${a.color}" opacity="0.85"><title>${esc(a.name)}</title></path>`;
+
+    totalByActivity[r.activityId] = (totalByActivity[r.activityId] || 0) + Math.floor((e - s) / 1000);
+  });
+
+  // Total time
+  const total = Object.values(totalByActivity).reduce((s, v) => s + v, 0);
+  const th = Math.floor(total / 3600), tm = Math.floor((total % 3600) / 60);
+  const totalLabel = th > 0 ? `${th}h${tm > 0 ? ' '+tm+'m' : ''}` : (tm > 0 ? `${tm}m` : '—');
+  out += `<text x="${cx}" y="${cy - 7}" text-anchor="middle" fill="#e0e0f0" font-size="18" font-weight="700">${totalLabel}</text>
+    <text x="${cx}" y="${cy + 10}" text-anchor="middle" fill="#44446a" font-size="10">合計</text>`;
+
+  svg.innerHTML = out;
+
+  // Legend
+  const entries = Object.entries(totalByActivity).sort((a, b) => b[1] - a[1]);
+  legend.innerHTML = entries.length ? entries.map(([activityId, secs]) => {
+    const a = activities.find(x => x.id === activityId) || { color: '#555', name: activityId };
+    const pct = total ? Math.round((secs / total) * 100) : 0;
+    return `<div style="display:flex;align-items:center;gap:8px;">
+      <span style="width:10px;height:10px;border-radius:2px;background:${a.color};flex-shrink:0;"></span>
+      <span style="font-size:12px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(a.name)}</span>
+      <span style="font-size:12px;color:var(--text2);white-space:nowrap;">${formatTime(secs)} <span style="color:${a.color}">${pct}%</span></span>
+    </div>`;
+  }).join('') : '<div style="color:var(--text2);font-size:12px;">データなし</div>';
+}
+
+function renderWeekChart(records, startDate) {
+  const svg = document.getElementById('donut-chart');
+  const legend = document.getElementById('donut-legend');
+  const W = 320, H = 260;
+  const TOP = 24, LEFT = 28, RIGHT = 8, BOTTOM = 16;
+  const chartH = H - TOP - BOTTOM;
+  const chartW = W - LEFT - RIGHT;
+  const colW = chartW / 7;
+  const innerW = Math.floor(colW * 0.72);
+  const colOff = Math.floor((colW - innerW) / 2);
+
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', H);
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const layout = document.getElementById('chart-layout');
+  layout.style.flexDirection = 'column';
+  layout.style.alignItems = 'flex-start';
+  legend.style.flex = '';
+
+  const start = new Date(startDate);
+  const dayRecords = Array.from({length: 7}, () => []);
+  for (const r of records) {
+    const rDate = new Date(r.date || r.startTime.slice(0, 10));
+    const diffDays = Math.round((rDate - start) / 86400000);
+    if (diffDays >= 0 && diffDays < 7) dayRecords[diffDays].push(r);
+  }
+
+  let out = '';
+  // Background tracks
+  for (let d = 0; d < 7; d++) {
+    const x = LEFT + d * colW + colOff;
+    out += `<rect x="${x}" y="${TOP}" width="${innerW}" height="${chartH}" fill="#1e1e2a" rx="2"/>`;
+  }
+  // Hour grid (0,6,12,18,24)
+  for (const h of [0, 6, 12, 18, 24]) {
+    const y = TOP + (h / 24) * chartH;
+    out += `<line x1="${LEFT}" y1="${y.toFixed(1)}" x2="${W - RIGHT}" y2="${y.toFixed(1)}" stroke="${h % 6 === 0 ? '#2a2a3a' : '#1e1e2a'}" stroke-width="1"/>`;
+    out += `<text x="${LEFT - 3}" y="${y.toFixed(1)}" text-anchor="end" dominant-baseline="middle" fill="#44446a" font-size="8">${h}</text>`;
+  }
+  // Activity segments
+  for (let d = 0; d < 7; d++) {
+    const x = LEFT + d * colW + colOff;
+    for (const r of dayRecords[d]) {
+      const a = activities.find(x => x.id === r.activityId);
+      if (!a) continue;
+      const st = new Date(r.startTime);
+      const et = r.endTime ? new Date(r.endTime) : new Date();
+      const sf = (st.getHours() + st.getMinutes() / 60 + st.getSeconds() / 3600) / 24;
+      const ef = (et.getHours() + et.getMinutes() / 60 + et.getSeconds() / 3600) / 24;
+      if (ef <= sf) continue;
+      const sy = TOP + sf * chartH;
+      const rh = Math.max(1.5, (ef - sf) * chartH);
+      out += `<rect x="${x}" y="${sy.toFixed(1)}" width="${innerW}" height="${rh.toFixed(1)}" fill="${a.color}" opacity="0.85" rx="1"><title>${esc(a.name)}</title></rect>`;
+    }
+  }
+  // Day labels
+  const dayLabels = ['月', '火', '水', '木', '金', '土', '日'];
+  const todayStr = new Date().toISOString().slice(0, 10);
+  for (let d = 0; d < 7; d++) {
+    const cx = LEFT + d * colW + colW / 2;
+    const dayDate = new Date(start.getTime() + d * 86400000);
+    const isToday = dayDate.toISOString().slice(0, 10) === todayStr;
+    out += `<text x="${cx.toFixed(1)}" y="${TOP - 7}" text-anchor="middle" fill="${isToday ? 'var(--accent)' : '#8888aa'}" font-size="9" font-weight="${isToday ? '700' : '400'}">${dayLabels[d]} ${dayDate.getDate()}</text>`;
+  }
+  svg.innerHTML = out;
+
+  const activityTotals = {};
+  for (const r of records) {
+    const secs = r.endTime ? r.durationSeconds : Math.floor((Date.now() - new Date(r.startTime)) / 1000);
+    activityTotals[r.activityId] = (activityTotals[r.activityId] || 0) + secs;
+  }
+  const entries = Object.entries(activityTotals).sort((a, b) => b[1] - a[1]);
+  legend.innerHTML = entries.length ? entries.map(([activityId, secs]) => {
+    const a = activities.find(x => x.id === activityId) || { color: '#555', name: activityId };
+    return `<div style="display:flex;align-items:center;gap:8px;">
+      <span style="width:10px;height:10px;border-radius:2px;background:${a.color};flex-shrink:0;"></span>
+      <span style="font-size:12px;color:var(--text);flex:1;">${esc(a.name)}</span>
+      <span style="font-size:12px;color:var(--text2)">${formatTime(secs)}</span>
+    </div>`;
+  }).join('') : '<div style="color:var(--text2);font-size:12px;">データなし</div>';
+}
+
+function renderMonthHourChart(records) {
+  const svg = document.getElementById('donut-chart');
+  const legend = document.getElementById('donut-legend');
+  const W = 320, H = 180;
+  const TOP = 8, LEFT = 36, RIGHT = 8, BOTTOM = 22;
+  const chartH = H - TOP - BOTTOM;
+  const chartW = W - LEFT - RIGHT;
+  const barW = Math.floor(chartW / 24);
+
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', H);
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const layout = document.getElementById('chart-layout');
+  layout.style.flexDirection = 'column';
+  layout.style.alignItems = 'flex-start';
+  legend.style.flex = '';
+
+  // hourData[h][activityId] = totalSeconds
+  const hourData = Array.from({length: 24}, () => ({}));
+  const activityOrder = [];
+  const seenActs = new Set();
+
+  for (const r of records) {
+    if (!seenActs.has(r.activityId)) { seenActs.add(r.activityId); activityOrder.push(r.activityId); }
+    const st = new Date(r.startTime);
+    const et = r.endTime ? new Date(r.endTime) : new Date();
+    const dayBase = new Date(st); dayBase.setHours(0, 0, 0, 0);
+    for (let h = 0; h < 24; h++) {
+      const hS = dayBase.getTime() + h * 3600000;
+      const hE = hS + 3600000;
+      const os = Math.max(st.getTime(), hS);
+      const oe = Math.min(et.getTime(), hE);
+      if (oe > os) {
+        hourData[h][r.activityId] = (hourData[h][r.activityId] || 0) + Math.floor((oe - os) / 1000);
+      }
+    }
+  }
+
+  const maxSecs = Math.max(1, ...hourData.map(h => Object.values(h).reduce((s, v) => s + v, 0)));
+  let out = '';
+
+  // Y grid
+  for (const frac of [0.25, 0.5, 0.75, 1.0]) {
+    const y = TOP + chartH * (1 - frac);
+    const label = formatTime(Math.round(maxSecs * frac));
+    out += `<line x1="${LEFT}" y1="${y.toFixed(1)}" x2="${W - RIGHT}" y2="${y.toFixed(1)}" stroke="#2a2a3a" stroke-width="0.5"/>`;
+    out += `<text x="${LEFT - 3}" y="${y.toFixed(1)}" text-anchor="end" dominant-baseline="middle" fill="#44446a" font-size="7">${label}</text>`;
+  }
+
+  // Stacked bars
+  for (let h = 0; h < 24; h++) {
+    const x = LEFT + h * barW;
+    let yOff = TOP + chartH;
+    for (const activityId of activityOrder) {
+      const secs = hourData[h][activityId] || 0;
+      if (secs === 0) continue;
+      const bh = (secs / maxSecs) * chartH;
+      yOff -= bh;
+      const a = activities.find(a => a.id === activityId);
+      out += `<rect x="${x + 1}" y="${yOff.toFixed(1)}" width="${barW - 2}" height="${bh.toFixed(1)}" fill="${a ? a.color : '#555'}" opacity="0.85" rx="1"/>`;
+    }
+  }
+
+  // X labels
+  for (const h of [0, 3, 6, 9, 12, 15, 18, 21]) {
+    const x = LEFT + h * barW + barW / 2;
+    out += `<text x="${x.toFixed(1)}" y="${H - BOTTOM + 10}" text-anchor="middle" fill="#44446a" font-size="7">${h}h</text>`;
+  }
+
+  svg.innerHTML = out;
+
+  const activityTotals = {};
+  for (const r of records) {
+    const secs = r.endTime ? r.durationSeconds : Math.floor((Date.now() - new Date(r.startTime)) / 1000);
+    activityTotals[r.activityId] = (activityTotals[r.activityId] || 0) + secs;
+  }
+  const entries = Object.entries(activityTotals).sort((a, b) => b[1] - a[1]);
+  legend.innerHTML = entries.length ? entries.map(([activityId, secs]) => {
+    const a = activities.find(x => x.id === activityId) || { color: '#555', name: activityId };
+    return `<div style="display:flex;align-items:center;gap:8px;">
+      <span style="width:10px;height:10px;border-radius:2px;background:${a.color};flex-shrink:0;"></span>
+      <span style="font-size:12px;color:var(--text);flex:1;">${esc(a.name)}</span>
+      <span style="font-size:12px;color:var(--text2)">${formatTime(secs)}</span>
+    </div>`;
+  }).join('') : '<div style="color:var(--text2);font-size:12px;">データなし</div>';
+}
+
+function renderYearChart(records) {
+  const svg = document.getElementById('donut-chart');
+  const legend = document.getElementById('donut-legend');
+
+  const W = 320;
+  const M_L = 38, M_R = 8, M_TOP = 20, M_BOT = 20;
+  const H_L = 38, H_R = 8, H_TOP = 10, H_BOT = 22;
+  const MONTH_H = 160;
+  const SEP = 28;
+  const HOUR_H = 130;
+  const H = MONTH_H + SEP + HOUR_H;
+
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', H);
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const layout = document.getElementById('chart-layout');
+  layout.style.flexDirection = 'column';
+  layout.style.alignItems = 'flex-start';
+  legend.style.flex = '';
+
+  // Build activity order
+  const activityOrder = [];
+  const seenActs = new Set();
+  for (const r of records) {
+    if (!seenActs.has(r.activityId)) { seenActs.add(r.activityId); activityOrder.push(r.activityId); }
+  }
+
+  // ── Monthly Data ──────────────────────────────────────────
+  const monthData = Array.from({length: 12}, () => ({}));
+  for (const r of records) {
+    const month = new Date(r.startTime).getMonth();
+    const secs = r.endTime ? r.durationSeconds : Math.floor((Date.now() - new Date(r.startTime)) / 1000);
+    monthData[month][r.activityId] = (monthData[month][r.activityId] || 0) + secs;
+  }
+  const monthTotals = monthData.map(m => Object.values(m).reduce((s, v) => s + v, 0));
+  const maxMonthSecs = Math.max(1, ...monthTotals);
+
+  const mChartW = W - M_L - M_R;
+  const mChartH = MONTH_H - M_TOP - M_BOT;
+  const colW = mChartW / 12;
+  const barW = Math.floor(colW * 0.72);
+  const barOff = Math.floor((colW - barW) / 2);
+
+  const viewYear = new Date(analyticsDate).getFullYear();
+  const nowYear = new Date().getFullYear();
+  const nowMonth = new Date().getMonth();
+
+  let out = '';
+
+  // Section label
+  out += `<text x="${M_L}" y="11" fill="#6666aa" font-size="8">月別合計</text>`;
+
+  // Y grid
+  for (const frac of [0.25, 0.5, 0.75, 1.0]) {
+    const y = M_TOP + mChartH * (1 - frac);
+    const label = formatTime(Math.round(maxMonthSecs * frac));
+    out += `<line x1="${M_L}" y1="${y.toFixed(1)}" x2="${W - M_R}" y2="${y.toFixed(1)}" stroke="#2a2a3a" stroke-width="0.5"/>`;
+    out += `<text x="${M_L - 3}" y="${y.toFixed(1)}" text-anchor="end" dominant-baseline="middle" fill="#44446a" font-size="7">${label}</text>`;
+  }
+
+  // Stacked bars
+  for (let m = 0; m < 12; m++) {
+    const x = M_L + m * colW + barOff;
+    let yOff = M_TOP + mChartH;
+    const isCurrentMonth = viewYear === nowYear && m === nowMonth;
+    for (const activityId of activityOrder) {
+      const secs = monthData[m][activityId] || 0;
+      if (secs === 0) continue;
+      const bh = (secs / maxMonthSecs) * mChartH;
+      yOff -= bh;
+      const a = activities.find(a => a.id === activityId);
+      out += `<rect x="${x}" y="${yOff.toFixed(1)}" width="${barW}" height="${bh.toFixed(1)}" fill="${a ? a.color : '#555'}" opacity="${isCurrentMonth ? '1' : '0.8'}" rx="1"><title>${a ? esc(a.name) : activityId}: ${formatTime(secs)}</title></rect>`;
+    }
+  }
+
+  // X labels
+  const MONTH_LABELS = ['1','2','3','4','5','6','7','8','9','10','11','12'];
+  for (let m = 0; m < 12; m++) {
+    const cx = M_L + m * colW + colW / 2;
+    const isCurrentMonth = viewYear === nowYear && m === nowMonth;
+    out += `<text x="${cx.toFixed(1)}" y="${MONTH_H - 6}" text-anchor="middle" fill="${isCurrentMonth ? 'var(--accent)' : '#8888aa'}" font-size="8" font-weight="${isCurrentMonth ? '700' : '400'}">${MONTH_LABELS[m]}月</text>`;
+  }
+
+  // ── Section separator ──────────────────────────────────────────
+  const sepY = MONTH_H + SEP / 2;
+  out += `<line x1="${M_L}" y1="${sepY.toFixed(1)}" x2="${W - M_R}" y2="${sepY.toFixed(1)}" stroke="#2a2a3a" stroke-width="0.5"/>`;
+  out += `<text x="${H_L}" y="${MONTH_H + SEP - 4}" fill="#6666aa" font-size="8">時間帯別合計</text>`;
+
+  // ── Hourly Data ──────────────────────────────────────────
+  const hBase = MONTH_H + SEP;
+  const hChartH = HOUR_H - H_TOP - H_BOT;
+  const hChartW = W - H_L - H_R;
+  const hBarW = Math.floor(hChartW / 24);
+
+  const hourData = Array.from({length: 24}, () => ({}));
+  for (const r of records) {
+    const st = new Date(r.startTime);
+    const et = r.endTime ? new Date(r.endTime) : new Date();
+    const dayBase = new Date(st); dayBase.setHours(0, 0, 0, 0);
+    for (let h = 0; h < 24; h++) {
+      const hS = dayBase.getTime() + h * 3600000;
+      const hE = hS + 3600000;
+      const os = Math.max(st.getTime(), hS);
+      const oe = Math.min(et.getTime(), hE);
+      if (oe > os) {
+        hourData[h][r.activityId] = (hourData[h][r.activityId] || 0) + Math.floor((oe - os) / 1000);
+      }
+    }
+  }
+
+  const maxHourSecs = Math.max(1, ...hourData.map(h => Object.values(h).reduce((s, v) => s + v, 0)));
+
+  // Y grid (hourly)
+  for (const frac of [0.5, 1.0]) {
+    const y = hBase + H_TOP + hChartH * (1 - frac);
+    const label = formatTime(Math.round(maxHourSecs * frac));
+    out += `<line x1="${H_L}" y1="${y.toFixed(1)}" x2="${W - H_R}" y2="${y.toFixed(1)}" stroke="#2a2a3a" stroke-width="0.5"/>`;
+    out += `<text x="${H_L - 3}" y="${y.toFixed(1)}" text-anchor="end" dominant-baseline="middle" fill="#44446a" font-size="7">${label}</text>`;
+  }
+
+  // Stacked hourly bars
+  for (let h = 0; h < 24; h++) {
+    const x = H_L + h * hBarW;
+    let yOff = hBase + H_TOP + hChartH;
+    for (const activityId of activityOrder) {
+      const secs = hourData[h][activityId] || 0;
+      if (secs === 0) continue;
+      const bh = (secs / maxHourSecs) * hChartH;
+      yOff -= bh;
+      const a = activities.find(a => a.id === activityId);
+      out += `<rect x="${x + 1}" y="${yOff.toFixed(1)}" width="${hBarW - 2}" height="${bh.toFixed(1)}" fill="${a ? a.color : '#555'}" opacity="0.85" rx="1"/>`;
+    }
+  }
+
+  // X labels (hours)
+  for (const h of [0, 3, 6, 9, 12, 15, 18, 21]) {
+    const x = H_L + h * hBarW + hBarW / 2;
+    out += `<text x="${x.toFixed(1)}" y="${hBase + H_TOP + hChartH + 13}" text-anchor="middle" fill="#44446a" font-size="7">${h}h</text>`;
+  }
+
+  svg.innerHTML = out;
+
+  // Legend with annual total + avg/day
+  const activityTotals = {};
+  for (const r of records) {
+    const secs = r.endTime ? r.durationSeconds : Math.floor((Date.now() - new Date(r.startTime)) / 1000);
+    activityTotals[r.activityId] = (activityTotals[r.activityId] || 0) + secs;
+  }
+  const totalDays = getPeriodDays();
+  const entries = Object.entries(activityTotals).sort((a, b) => b[1] - a[1]);
+  legend.innerHTML = entries.length ? entries.map(([activityId, secs]) => {
+    const a = activities.find(x => x.id === activityId) || { color: '#555', name: activityId };
+    const avgSecs = Math.round(secs / totalDays);
+    return `<div style="display:flex;align-items:center;gap:8px;">
+      <span style="width:10px;height:10px;border-radius:2px;background:${a.color};flex-shrink:0;"></span>
+      <span style="font-size:12px;color:var(--text);flex:1;">${esc(a.name)}</span>
+      <span style="font-size:11px;color:var(--text2);text-align:right;line-height:1.5">${formatTime(secs)}<br><span style="font-size:10px;color:#555">${formatTime(avgSecs)}/day avg</span></span>
+    </div>`;
+  }).join('') : '<div style="color:var(--text2);font-size:12px;">データなし</div>';
+}
+
+function renderAnalytics(records, startDate) {
+  if (!analyticsData) return;
+
+  const byActivity = {};
+  for (const row of analyticsData) {
+    if (!byActivity[row.activityId]) byActivity[row.activityId] = 0;
+    byActivity[row.activityId] += row.totalSeconds;
+  }
+
+  if (currentPeriod === 'week') {
+    renderWeekChart(records || [], startDate);
+  } else if (currentPeriod === 'month') {
+    renderMonthHourChart(records || []);
+  } else if (currentPeriod === 'year') {
+    renderYearChart(records || []);
+  } else {
+    renderClock24(records);
+  }
+
+  const periodDays = getPeriodDays();
+  const tbody = document.getElementById('summary-table-body');
+  tbody.innerHTML = Object.entries(byActivity).sort((a,b)=>b[1]-a[1]).map(([activityId, secs]) => {
+    const a = activities.find(x => x.id === activityId) || { name: activityId, color: '#888', goalMinutes: 0, goalType: 'none' };
+    const dailyGoalSecs = (a.goalMinutes || 0) * 60;
+    const periodGoalSecs = dailyGoalSecs * periodDays;
+    let goalStr = '—';
+    if (a.goalType !== 'none' && a.goalMinutes) {
+      const sym = a.goalType === 'min' ? '≥' : '≤';
+      goalStr = periodDays > 1
+        ? `${sym} ${fmtGoal(a.goalMinutes)}/day<br><span style="font-size:11px;color:var(--text2)">(${fmtGoal(a.goalMinutes * periodDays)} / ${periodDays}日)</span>`
+        : `${sym} ${fmtGoal(a.goalMinutes)}/day`;
+    }
+    let progressStr = '—';
+    if (periodGoalSecs > 0 && a.goalType !== 'none') {
+      const pct = Math.round((secs / periodGoalSecs) * 100);
+      const ok = a.goalType === 'min' ? pct >= 100 : pct <= 100;
+      const color = ok ? 'var(--green)' : (a.goalType === 'min' ? 'var(--yellow)' : 'var(--red)');
+      progressStr = `<span style="color:${color}">${pct}%</span>`;
+    }
+    return `<tr>
+      <td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${a.color};margin-right:8px"></span>${esc(a.name)}</td>
+      <td>${formatTime(secs)}</td>
+      <td>${goalStr}</td>
+      <td>${progressStr}</td>
+    </tr>`;
+  }).join('');
+}
+
+document.querySelectorAll('.period-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentPeriod = btn.dataset.period;
+    document.querySelectorAll('.period-btn').forEach(b => b.classList.toggle('active', b === btn));
+    if (currentPage === 'analytics') loadAnalytics();
+  });
+});
+
+// ── Settings ──────────────────────────────────────────────────────────────────
+async function toggleAutoTrack(enabled) {
+  await window.api.setAutoTrack(enabled);
+  document.getElementById('auto-track-banner').classList.toggle('visible', enabled);
+  renderDashboard(); // show/hide link buttons
+  showToast(enabled ? 'Auto-tracking enabled' : 'Auto-tracking disabled');
+}
+
+async function toggleIdle(enabled) {
+  await window.api.setIdleEnabled(enabled);
+  document.getElementById('idle-threshold-row').style.display = enabled ? 'flex' : 'none';
+  showToast(enabled ? `Idle detection ON (${document.getElementById('idle-threshold-slider').value}分)` : 'Idle detection OFF');
+}
+
+async function updateIdleThreshold(val) {
+  document.getElementById('idle-threshold-label').textContent = `${val}分`;
+  await window.api.setIdleThreshold(parseInt(val));
+}
+
+async function applyClaudeHooks() {
+  try {
+    const result = await window.api.applyClaudeHookConfig();
+    showToast('Claude Code hookを設定しました → Claude Codeを再起動してください');
+    await refreshClaudeStatus();
+  } catch(e) {
+    showToast('エラー: ' + e.message);
+  }
+}
+
+async function refreshClaudeStatus() {
+  const status = await window.api.getClaudeHookStatus();
+  const el = document.getElementById('claude-hook-status');
+  if (status.running) {
+    const seg = status.currentSegment;
+    const segColor = seg === 'claude' ? 'var(--accent)' : seg === 'user' ? 'var(--green)' : 'var(--text2)';
+    const segLabel = seg === 'claude' ? '🤖 Claude自律実行中' : seg === 'user' ? '👤 ユーザー操作中' : '—';
+    el.innerHTML = `
+      <div style="color:var(--green);margin-bottom:6px;">✓ Hook serverが稼働中 (port ${status.port})</div>
+      <div>現在のセグメント: <span style="color:${segColor};font-weight:600">${segLabel}</span></div>
+      ${status.lastEvent ? `<div style="margin-top:4px">最後のイベント: ${status.lastEvent.event} (${new Date(status.lastEvent.ts).toLocaleTimeString()})</div>` : ''}
+    `;
+  } else {
+    el.innerHTML = `<div style="color:var(--text2)">Hook server停止中</div>`;
+  }
+}
+
+// ── Setup Guide ───────────────────────────────────────────────────────────────
+
+async function refreshSetupGuide() {
+  const [acts, cfg, hookStatus] = await Promise.all([
+    window.api.getActivities(),
+    window.api.getSettings(),
+    window.api.getClaudeHookStatus(),
+  ]);
+
+  const claudeAct = acts.find(a => /claude/i.test(a.name));
+  const s1 = !!claudeAct;
+  const s2 = s1 && (claudeAct.windowPatterns || []).length > 0;
+  const s3 = !!cfg.autoTrack;
+  const s4 = !!hookStatus.lastEvent;
+
+  const doneCount = [s1, s2, s3, s4].filter(Boolean).length;
+  document.getElementById('setup-progress').textContent = `${doneCount}/4 完了`;
+
+  const steps = [
+    {
+      done: s1,
+      title: 'Claude Code 活動を作成する',
+      desc: '計測対象として「Claude Code」という活動を登録します',
+      btn: s1 ? null : { label: '活動を作成', fn: 'setupStep1()' },
+    },
+    {
+      done: s2,
+      title: 'Claude Code ウィンドウを紐づける',
+      desc: 'タイトルに「Claude Code」を含むウィンドウを選ぶと自動計測が始まります',
+      btn: (!s2 && s1) ? { label: '紐づける', fn: `openWindowLinkModal('${claudeAct ? claudeAct.id : ''}')` } : null,
+    },
+    {
+      done: s3,
+      title: 'Auto Window Tracking をONにする',
+      desc: '紐づけたウィンドウが前面になると自動でタイマーが起動・停止します',
+      btn: s3 ? null : { label: 'ONにする', fn: 'setupEnableAutoTrack()' },
+    },
+    {
+      done: s4,
+      title: 'Claude Hook を適用する',
+      desc: 'ユーザー操作 / Claude自律実行の時間を分けて記録します。適用後はClaude Codeを再起動してください',
+      btn: s4 ? null : { label: 'Hookを適用', fn: 'applyClaudeHooksAndRefresh()' },
+    },
+  ];
+
+  document.getElementById('setup-steps-list').innerHTML = steps.map((s, i) => `
+    <div class="setup-step">
+      <div class="step-icon ${s.done ? 'done' : 'todo'}">${s.done ? '✓' : i + 1}</div>
+      <div class="step-body">
+        <div class="step-title-row">
+          <span class="step-title ${s.done ? 'done' : ''}">${esc(s.title)}</span>
+          ${s.done ? '<span class="step-done-badge">完了</span>' : ''}
+        </div>
+        <div class="step-desc">${esc(s.desc)}</div>
+      </div>
+      ${s.btn ? `<button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;white-space:nowrap;flex-shrink:0;" onclick="${s.btn.fn}">${esc(s.btn.label)}</button>` : ''}
+    </div>
+  `).join('');
+}
+
+async function setupStep1() {
+  navigateTo('activities');
+  await new Promise(r => setTimeout(r, 30));
+  openActivityModal();
+  document.getElementById('input-name').value = 'Claude Code';
+  modalPatterns = ['Claude Code'];
+  renderModalPatterns();
+  showToast('活動名とパターンを入力済み — Saveを押してください');
+}
+
+async function setupEnableAutoTrack() {
+  document.getElementById('setting-auto-track').checked = true;
+  await toggleAutoTrack(true);
+  await refreshSetupGuide();
+}
+
+async function applyClaudeHooksAndRefresh() {
+  await applyClaudeHooks();
+  await refreshSetupGuide();
+}
+
+async function initSettings() {
+  const settings = await window.api.getSettings();
+  windowAliases = settings.windowAliases || {};
+  const idleState = await window.api.getIdleState();
+
+  document.getElementById('setting-auto-track').checked = settings.autoTrack || false;
+  document.getElementById('setting-login').checked = settings.startWithLogin || false;
+  document.getElementById('setting-notify').checked = settings.goalNotifications !== false;
+
+  const currentTheme = settings.theme || 'void';
+  document.documentElement.dataset.theme = currentTheme;
+  document.querySelectorAll('.theme-swatch').forEach(el => {
+    el.classList.toggle('active', el.dataset.theme === currentTheme);
+  });
+  document.getElementById('setting-idle').checked = idleState.enabled;
+  document.getElementById('idle-threshold-row').style.display = idleState.enabled ? 'flex' : 'none';
+  document.getElementById('idle-threshold-slider').value = idleState.thresholdMinutes;
+  document.getElementById('idle-threshold-label').textContent = `${idleState.thresholdMinutes}分`;
+
+  if (settings.autoTrack) {
+    document.getElementById('auto-track-banner').classList.add('visible');
+  }
+
+  await refreshClaudeStatus();
+  await refreshSetupGuide();
+  setInterval(async () => {
+    await refreshClaudeStatus();
+    await refreshSetupGuide();
+  }, 5000);
+}
+
+async function setTheme(theme) {
+  await window.api.setSettings({ theme });
+  document.documentElement.dataset.theme = theme;
+  document.querySelectorAll('.theme-swatch').forEach(el => {
+    el.classList.toggle('active', el.dataset.theme === theme);
+  });
+  showToast(`テーマ: ${theme}`);
+}
+
+async function toggleOverlay(show) {
+  showToast(show ? 'Overlay shown' : 'Overlay hidden');
+}
+
+async function toggleLoginItem(enabled) {
+  await window.api.setSettings({ startWithLogin: enabled });
+  showToast(enabled ? 'ログイン時に自動起動します' : '自動起動を無効にしました');
+}
+
+async function toggleNotify(enabled) {
+  await window.api.setSettings({ goalNotifications: enabled });
+  showToast(enabled ? '目標通知をONにしました' : '目標通知をOFFにしました');
+}
+
+async function exportData() {
+  const result = await window.api.exportJSON();
+  if (result.cancelled) return;
+  if (result.ok) showToast(`エクスポート完了: ${result.filePath.split('\\').pop()}`);
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function formatTime(seconds) {
+  if (!seconds) return '0:00:00';
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+function esc(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// Close modals on overlay click
+document.getElementById('activity-modal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeActivityModal();
+});
+document.getElementById('window-link-modal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeWindowLinkModal();
+});
+document.getElementById('alias-modal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeAliasModal();
+});
+
+init();
+</script>
+</body>
+</html>

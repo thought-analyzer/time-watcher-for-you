@@ -1,0 +1,48 @@
+{
+  "name": "time-watcher-for-you",
+  "version": "0.1.0",
+  "description": "Precision activity time tracker for busy people",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder --win"
+  },
+  "keywords": [
+    "time-tracker",
+    "productivity",
+    "electron"
+  ],
+  "author": "saifo",
+  "license": "MIT",
+  "build": {
+    "appId": "com.saifo.time-watcher-for-you",
+    "productName": "Time Watcher",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "overlay-preload.js",
+      "db.js",
+      "src/**/*",
+      "tracker/**/*",
+      "!data/**/*",
+      "!logs/**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerLanguages": ["ja"],
+      "language": "1041"
+    }
+  },
+  "devDependencies": {
+    "electron": "^41.2.0",
+    "electron-builder": "^26.8.1"
+  }
+}

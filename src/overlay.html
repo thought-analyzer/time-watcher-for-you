@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ── Themes ─────────────────────────────────────────────────────── */
+:root {
+  --bg:      rgba(6,6,6,0.95);
+  --bg2:     rgba(255,255,255,0.04);
+  --bg3:     rgba(255,255,255,0.08);
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.14);
+  --text:    #ffffff;
+  --text2:   #666666;
+  --text3:   #3a3a3a;
+  --shadow:  rgba(0,0,0,0.6);
+}
+[data-theme="carbon"] {
+  --bg:      rgba(17,17,17,0.96);
+  --bg2:     rgba(255,255,255,0.05);
+  --bg3:     rgba(255,255,255,0.09);
+  --border:  rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.16);
+  --text:    #f0f0f0;
+  --text2:   #606060;
+  --text3:   #383838;
+  --shadow:  rgba(0,0,0,0.5);
+}
+[data-theme="ash"] {
+  --bg:      rgba(28,28,28,0.97);
+  --bg2:     rgba(255,255,255,0.06);
+  --bg3:     rgba(255,255,255,0.11);
+  --border:  rgba(255,255,255,0.10);
+  --border2: rgba(255,255,255,0.20);
+  --text:    #ebebeb;
+  --text2:   #707070;
+  --text3:   #454545;
+  --shadow:  rgba(0,0,0,0.4);
+}
+[data-theme="chalk"] {
+  --bg:      rgba(247,247,247,0.97);
+  --bg2:     rgba(0,0,0,0.04);
+  --bg3:     rgba(0,0,0,0.08);
+  --border:  rgba(0,0,0,0.09);
+  --border2: rgba(0,0,0,0.18);
+  --text:    #0a0a0a;
+  --text2:   #707070;
+  --text3:   #b0b0b0;
+  --shadow:  rgba(0,0,0,0.15);
+}
+[data-theme="forest"] {
+  --bg:      rgba(240,253,244,0.97);
+  --bg2:     rgba(22,163,74,0.06);
+  --bg3:     rgba(22,163,74,0.12);
+  --border:  rgba(22,163,74,0.15);
+  --border2: rgba(22,163,74,0.30);
+  --text:    #052e16;
+  --text2:   #166534;
+  --text3:   #bbf7d0;
+  --shadow:  rgba(0,60,20,0.15);
+}
+[data-theme="ocean"] {
+  --bg:      rgba(240,249,255,0.97);
+  --bg2:     rgba(2,132,199,0.06);
+  --bg3:     rgba(2,132,199,0.12);
+  --border:  rgba(2,132,199,0.15);
+  --border2: rgba(2,132,199,0.30);
+  --text:    #0c4a6e;
+  --text2:   #0369a1;
+  --text3:   #bae6fd;
+  --shadow:  rgba(0,30,60,0.15);
+}
+[data-theme="rose"] {
+  --bg:      rgba(255,241,246,0.97);
+  --bg2:     rgba(219,39,119,0.06);
+  --bg3:     rgba(219,39,119,0.12);
+  --border:  rgba(219,39,119,0.15);
+  --border2: rgba(219,39,119,0.30);
+  --text:    #500724;
+  --text2:   #9d174d;
+  --text3:   #fbcfe8;
+  --shadow:  rgba(60,0,30,0.15);
+}
+
+/* ── Base ───────────────────────────────────────────────────────── */
+html, body { background: transparent; overflow: hidden; width: 300px; }
+#overlay {
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-feature-settings: "cv01","ss03";
+  color: var(--text);
+  -webkit-app-region: drag;
+  user-select: none;
+  backdrop-filter: blur(36px) saturate(1.6);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  box-shadow:
+    0 12px 40px var(--shadow),
+    0 0 0 1px rgba(255,255,255,0.03) inset;
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+#header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 10px 8px;
+  border-bottom: 1px solid var(--border);
+  -webkit-app-region: drag;
+}
+#win-badge {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10px; font-weight: 500; letter-spacing: 0.03em;
+  color: var(--text2); min-width: 0; flex: 1;
+}
+#win-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--text3); flex-shrink: 0; transition: background .3s;
+}
+#win-dot.active {
+  background: #22c55e;
+  box-shadow: 0 0 6px rgba(34,197,94,0.6);
+  animation: pulse-dot 2.4s ease-in-out infinite;
+}
+@keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.35} }
+#win-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hbtns { -webkit-app-region: no-drag; display: flex; flex-shrink: 0; }
+.hbtn {
+  background: none; border: none; color: var(--text3);
+  cursor: pointer; font-size: 13px; padding: 2px 5px; border-radius: 5px;
+  line-height: 1; transition: color .12s, background .12s;
+}
+.hbtn:hover { color: var(--text); background: var(--bg3); }
+
+/* ── Body ───────────────────────────────────────────────────────── */
+#body { padding: 7px 7px 0; }
+
+/* ── Running card ───────────────────────────────────────────────── */
+.running-card {
+  border-radius: 10px;
+  padding: 10px 12px 10px 15px;
+  margin-bottom: 5px;
+  -webkit-app-region: no-drag;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  transition: border-color .2s;
+}
+.running-card:hover { border-color: var(--border2); }
+.card-accent {
+  position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+  border-radius: 10px 0 0 10px;
+}
+.rc-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 7px;
+}
+.rc-name {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--text2);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;
+}
+.rc-stop {
+  background: none; color: var(--text3);
+  border: 1px solid var(--border2); border-radius: 5px;
+  width: 20px; height: 20px; font-size: 8px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  transition: all .15s; margin-left: 6px;
+}
+.rc-stop:hover { color: var(--text); background: var(--bg3); }
+
+/* TIME — hero element */
+.rc-time {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 38px; font-weight: 700;
+  letter-spacing: -2px; line-height: 1;
+  margin-bottom: 9px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.rc-time .sep {
+  color: var(--text3); font-weight: 400;
+  animation: blink-sep 1s step-end infinite;
+}
+@keyframes blink-sep { 0%,100%{opacity:1} 50%{opacity:.1} }
+
+.rc-matched {
+  font-size: 9px; color: var(--text3); margin-bottom: 8px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+.rc-matched span { opacity: 0.5; margin-right: 3px; }
+
+/* Progress */
+.progress-track {
+  height: 2px; background: var(--border);
+  border-radius: 99px; overflow: hidden; margin-bottom: 5px;
+}
+.progress-fill { height: 100%; border-radius: 99px; transition: width .6s ease; }
+.rc-goal-label {
+  display: flex; justify-content: space-between;
+  font-size: 10px; color: var(--text2);
+  font-variant-numeric: tabular-nums; letter-spacing: 0.02em;
+}
+
+/* ── Idle rows ──────────────────────────────────────────────────── */
+.section-divider { height: 1px; background: var(--border); margin: 3px 0; }
+.idle-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 6px; border-radius: 7px;
+  -webkit-app-region: no-drag; transition: background .1s;
+}
+.idle-row:hover { background: var(--bg2); }
+.ir-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; opacity: 0.5; }
+.ir-name {
+  font-size: 11px; color: var(--text2); flex: 1;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ir-time {
+  font-size: 11px; color: var(--text2);
+  font-family: 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums; letter-spacing: -0.5px; white-space: nowrap;
+}
+.ir-start {
+  background: none; color: var(--text3);
+  border: 1px solid var(--border); border-radius: 4px;
+  width: 16px; height: 16px; font-size: 8px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; opacity: 0; transition: opacity .12s, background .12s;
+}
+.idle-row:hover .ir-start { opacity: 1; }
+.ir-start:hover { background: var(--bg3); color: var(--text); }
+
+.no-act { text-align: center; font-size: 11px; color: var(--text3); padding: 14px 0; }
+
+/* ── Footer ─────────────────────────────────────────────────────── */
+#footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 5px 10px 8px;
+  -webkit-app-region: no-drag;
+}
+#clock {
+  font-size: 10px; font-weight: 500; color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums; letter-spacing: 0.03em;
+}
+.open-link {
+  font-size: 10px; color: var(--text3); letter-spacing: 0.03em;
+  background: none; border: none; cursor: pointer; padding: 0;
+  font-family: inherit; transition: color .12s;
+}
+.open-link:hover { color: var(--text); }
+</style>
+</head>
+<body>
+<div id="overlay">
+  <div id="header">
+    <div id="win-badge">
+      <div id="win-dot"></div>
+      <span id="win-name">—</span>
+    </div>
+    <div class="hbtns">
+      <button class="hbtn" id="btn-expand" onclick="toggleExpand()" title="すべて表示">≡</button>
+      <button class="hbtn" onclick="window.overlay.openMain()" title="メインウィンドウ">⊞</button>
+      <button class="hbtn" id="btn-collapse" onclick="toggleCollapse()" title="折りたたむ">−</button>
+      <button class="hbtn" onclick="window.overlay.quitApp()" title="終了" style="margin-left:2px;">×</button>
+    </div>
+  </div>
+  <div id="body">
+    <div id="timer-list"></div>
+    <div id="footer">
+      <button class="open-link" onclick="window.overlay.openMain()">Open →</button>
+      <span id="clock"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+let collapsed = false;
+let expanded = false;
+let currentState = { timers: [] };
+
+const PROC_SHORT = {
+  WindowsTerminal:'Terminal', powershell:'PS', cmd:'CMD',
+  chrome:'Chrome', msedge:'Edge', firefox:'Firefox',
+  Code:'VSCode', electron:'Electron', slack:'Slack',
+  notion:'Notion', figma:'Figma', explorer:'Explorer',
+};
+function shortProc(n) {
+  if (!n || n === 'unknown') return '—';
+  return PROC_SHORT[n] || (n.length > 12 ? n.slice(0,11)+'…' : n);
+}
+
+function fmtTime(sec) {
+  if (!sec && sec !== 0) return '0:00:00';
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+function fmtParts(sec) {
+  return {
+    h: String(Math.floor(sec / 3600)),
+    m: String(Math.floor((sec % 3600) / 60)).padStart(2,'0'),
+    s: String(sec % 60).padStart(2,'0'),
+  };
+}
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme || 'void';
+}
+
+function toggleCollapse() {
+  collapsed = !collapsed;
+  document.getElementById('body').style.display = collapsed ? 'none' : 'block';
+  document.getElementById('btn-collapse').textContent = collapsed ? '+' : '−';
+  autoResize();
+}
+function toggleExpand() {
+  expanded = !expanded;
+  document.getElementById('btn-expand').style.color = expanded ? 'var(--text)' : '';
+  render(currentState);
+}
+
+function render(state) {
+  currentState = state;
+  const list = document.getElementById('timer-list');
+  const running  = state.timers.filter(t => t.isRunning);
+  const withTime = state.timers.filter(t => !t.isRunning && t.todaySeconds > 0);
+
+  if (!state.timers.length) {
+    list.innerHTML = '<div class="no-act">No activities yet</div>';
+    autoResize(); return;
+  }
+
+  let html = '';
+
+  for (const t of running) {
+    const { h, m, s } = fmtParts(t.todaySeconds);
+    const hasGoal = t.goalMinutes && t.goalType !== 'none';
+    const goalSec = (t.goalMinutes || 0) * 60;
+    const pct = hasGoal ? Math.min(100, Math.round((t.todaySeconds / goalSec) * 100)) : 0;
+    const remaining = goalSec - t.todaySeconds;
+    const isOver = remaining <= 0;
+    const barColor = hasGoal
+      ? (t.goalType === 'max' ? (isOver ? '#ef4444' : t.color) : (isOver ? '#22c55e' : t.color))
+      : t.color;
+    const goalLabel = hasGoal
+      ? (isOver
+          ? `<span style="color:${barColor}">+${fmtTime(Math.abs(remaining))}</span><span>${pct}%</span>`
+          : `<span>残 ${fmtTime(remaining)}</span><span style="color:${barColor}">${pct}%</span>`)
+      : '';
+
+    html += `
+    <div class="running-card">
+      <div class="card-accent" style="background:${t.color};"></div>
+      <div class="rc-top">
+        <div class="rc-name">${esc(t.activityName)}</div>
+        <button class="rc-stop" onclick="toggleTimer('${t.activityId}',true)" title="停止">■</button>
+      </div>
+      <div class="rc-time">
+        <span>${h}</span><span class="sep">:</span><span>${m}</span><span class="sep">:</span><span>${s}</span>
+      </div>
+      ${t.matchedPattern ? `<div class="rc-matched"><span>▶</span>${esc(t.matchedPattern.length > 30 ? t.matchedPattern.slice(0,29)+'…' : t.matchedPattern)}</div>` : ''}
+      ${hasGoal ? `
+      <div class="progress-track">
+        <div class="progress-fill" style="width:${pct}%;background:${barColor};"></div>
+      </div>
+      <div class="rc-goal-label">${goalLabel}</div>` : ''}
+    </div>`;
+  }
+
+  const idleToShow = expanded ? withTime : withTime.slice(0, 4);
+  if (idleToShow.length && running.length) html += '<div class="section-divider"></div>';
+
+  for (const t of idleToShow) {
+    html += `
+    <div class="idle-row">
+      <div class="ir-dot" style="background:${t.color}"></div>
+      <div class="ir-name">${esc(t.activityName)}</div>
+      <div class="ir-time">${fmtTime(t.todaySeconds)}</div>
+      <button class="ir-start" onclick="toggleTimer('${t.activityId}',false)">▶</button>
+    </div>`;
+  }
+
+  if (!running.length && !withTime.length) html = '<div class="no-act">計測なし</div>';
+
+  list.innerHTML = html;
+  autoResize();
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function toggleTimer(activityId, isRunning) {
+  if (isRunning) await window.overlay.stopTimer(activityId);
+  else await window.overlay.startTimer(activityId);
+}
+
+function updateWindowBadge(info) {
+  const dot  = document.getElementById('win-dot');
+  const name = document.getElementById('win-name');
+  if (!info || !info.processName) {
+    dot.className = 'win-dot'; name.textContent = '—'; return;
+  }
+  dot.className = 'win-dot active';
+  name.textContent = shortProc(info.processName);
+}
+
+function updateClock() {
+  document.getElementById('clock').textContent =
+    new Date().toLocaleTimeString('ja-JP', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+}
+function autoResize() {
+  requestAnimationFrame(() => {
+    window.overlay.resize(document.getElementById('overlay').scrollHeight + 4);
+  });
+}
+
+async function init() {
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  const [state, win, settings] = await Promise.all([
+    window.overlay.getState(),
+    window.overlay.getCurrentWindow(),
+    window.overlay.getSettings(),
+  ]);
+
+  applyTheme(settings.theme || 'void');
+  render(state);
+  if (win) updateWindowBadge(win);
+  setTimeout(autoResize, 150);
+
+  window.overlay.on('timer:tick',          s    => render(s));
+  window.overlay.on('tracker:windowChange', info => updateWindowBadge(info));
+  window.overlay.on('theme:changed',        t    => applyTheme(t));
+}
+
+init();
+</script>
+</body>
+</html>
