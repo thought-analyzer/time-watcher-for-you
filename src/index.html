@@ -1021,11 +1021,12 @@ body {
     </div>
 
     <div class="form-group">
-      <label>手動でパターンを追加 (テキストまたは正規表現)</label>
+      <label>キーワードで紐づけ（部分一致）</label>
       <div style="display:flex;gap:6px;">
-        <input type="text" id="manual-pattern-input" placeholder="例: chrome  /  Code  /  claude">
+        <input type="text" id="manual-pattern-input" placeholder="例: Medium / note / GitHub">
         <button class="btn btn-ghost" onclick="addManualPattern()" style="white-space:nowrap;font-size:12px;">追加</button>
       </div>
+      <div style="font-size:11px;color:var(--text2);margin-top:4px;">タイトルに含む全ウィンドウにマッチ（正規表現も可）</div>
     </div>
 
     <div class="linked-patterns" id="linked-patterns-view"></div>
@@ -1730,6 +1731,9 @@ async function refreshWindowLinkModal() {
             <button class="btn btn-ghost" style="font-size:11px;padding:3px 8px;" onclick="linkFromHistory('title','${esc(win.title.replace(/'/g,"\\'"))}')">
               タイトルで紐づけ
             </button>
+            <button class="btn btn-ghost" style="font-size:11px;padding:3px 8px;color:var(--accent);" onclick="prefillKeyword('${esc(win.title.replace(/'/g,"\\'"))}')">
+              キーワード
+            </button>
           </div>
         </div>
       </div>`;
@@ -1756,6 +1760,14 @@ function renderLinkedPatterns(activity) {
         </div>
       `).join('')}
     </div>`;
+}
+
+function prefillKeyword(title) {
+  // Pre-fill the keyword input with the window title so user can trim to keyword (e.g. "Medium")
+  const input = document.getElementById('manual-pattern-input');
+  input.value = title;
+  input.focus();
+  input.select();
 }
 
 async function linkFromHistory(type, value) {
@@ -2065,8 +2077,8 @@ function renderClock24(records) {
   const total = Object.values(totalByActivity).reduce((s, v) => s + v, 0);
   const th = Math.floor(total / 3600), tm = Math.floor((total % 3600) / 60);
   const totalLabel = th > 0 ? `${th}h${tm > 0 ? ' '+tm+'m' : ''}` : (tm > 0 ? `${tm}m` : '—');
-  out += `<text x="${cx}" y="${cy - 7}" text-anchor="middle" fill="#e0e0f0" font-size="18" font-weight="700">${totalLabel}</text>
-    <text x="${cx}" y="${cy + 10}" text-anchor="middle" fill="#44446a" font-size="10">合計</text>`;
+  out += `<text x="${cx}" y="${cy - 7}" text-anchor="middle" fill="#ffffff" font-size="18" font-weight="700">${totalLabel}</text>
+    <text x="${cx}" y="${cy + 10}" text-anchor="middle" fill="#9999cc" font-size="10">合計</text>`;
 
   svg.innerHTML = out;
 

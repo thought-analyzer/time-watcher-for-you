@@ -41,6 +41,11 @@ while ($true) {
 
 const SELF_PROCESS_NAMES = ['electron', 'time-watcher'];
 
+// Strip leading Unicode symbols (e.g. ❖ in "❖ Claude Code", emoji, etc.)
+function normalizeTitle(title) {
+  return title.replace(/^[\p{So}\p{Sm}\p{Sk}\p{Po}]+\s*/u, '').trim();
+}
+
 class WindowTracker {
   constructor() {
     this.process = null;
@@ -79,7 +84,7 @@ class WindowTracker {
         if (!trimmed || trimmed === 'error|error') continue;
         const pipeIdx = trimmed.lastIndexOf('|');
         if (pipeIdx === -1) continue;
-        const title = trimmed.slice(0, pipeIdx).trim();
+        const title = normalizeTitle(trimmed.slice(0, pipeIdx).trim());
         const processName = trimmed.slice(pipeIdx + 1).trim();
         const info = { title, processName, timestamp: Date.now() };
         if (!this.currentWindow ||

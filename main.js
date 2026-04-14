@@ -3,7 +3,7 @@
  * saifo - Activity time tracker
  */
 
-const { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage, shell, Notification } = require('electron');
+const { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage, shell, Notification, powerMonitor } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const db = require('./db');
@@ -422,6 +422,27 @@ function stopIdleDetection() {
   }
 }
 
+// ── Sleep / Wake Detection ─────────────────────────────────────────────────────
+
+function initPowerMonitor() {
+  // Stop all timers when PC goes to sleep — don't count sleep as work time
+  powerMonitor.on('suspend', () => {
+    for (const [activityId, entry] of activeTimers) {
+      const rec = db.getRecordsForDate(db.todayStr()).find(r => r.id === entry.recordId);
+      if (rec) stopTimer(activityId);
+    }
+    idlePausedTimers.clear(); // idle state is irrelevant after sleep
+    broadcast('system:suspended', {});
+    updateTrayMenu();
+  });
+
+  // On resume: just notify UI. Don't auto-restart timers.
+  powerMonitor.on('resume', () => {
+    broadcast('system:resumed', {});
+    updateTrayMenu();
+  });
+}
+
 // ── Claude Code Hook Integration ──────────────────────────────────────────────
 
 function startClaudeHookServer() {
@@ -685,7 +706,8 @@ if (!app.isPackaged) {
 
 // ── Single Instance Lock ──────────────────────────────────────────────────────
 
-const gotLock = app.requestSingleInstanceLock();
+// Dev mode skips single-instance lock so npm start always shows latest code
+const gotLock = app.isPackaged ? app.requestSingleInstanceLock() : true;
 if (!gotLock) {
   app.quit();
 } else {
@@ -715,6 +737,9 @@ app.whenReady().then(() => {
 
   if (settings.autoTrack) enableAutoTrack();
   if (settings.idleDetection) startIdleDetection();
+
+  // Sleep/wake detection — always active
+  initPowerMonitor();
 
   // Always start Claude hook server (it handles port conflict gracefully)
   startClaudeHookServer();
