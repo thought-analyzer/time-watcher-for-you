@@ -124,6 +124,22 @@ function createMainWindow() {
   mainWindow.on('close', () => {
     app.quit();
   });
+
+  mainWindow.webContents.on('render-process-gone', (event, details) => {
+    console.error('[main] render-process-gone:', details.reason);
+    if (details.reason !== 'clean-exit') {
+      // Recreate the window instead of letting the app die
+      mainWindow = null;
+      createMainWindow();
+    }
+  });
+
+  mainWindow.on('unresponsive', () => {
+    console.warn('[main] mainWindow became unresponsive, reloading...');
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.reload();
+    }
+  });
 }
 
 function createOverlayWindow() {
@@ -151,6 +167,15 @@ function createOverlayWindow() {
 
   overlayWindow.on('closed', () => {
     overlayWindow = null;
+  });
+
+  overlayWindow.webContents.on('render-process-gone', (event, details) => {
+    console.error('[overlay] render-process-gone:', details.reason);
+    if (details.reason !== 'clean-exit') {
+      overlayWindow = null;
+      // Recreate overlay after short delay to avoid rapid crash loop
+      setTimeout(() => createOverlayWindow(), 1000);
+    }
   });
 }
 
@@ -696,6 +721,12 @@ function registerIPC() {
     }
   });
 }
+
+// ── Windows 11 crash workaround ───────────────────────────────────────────────
+// Disabling CalculateNativeWinOcclusion prevents random renderer crashes on
+// Windows 11 where Chromium's occlusion detection has known instability.
+// See: https://github.com/electron/electron/issues/34700
+app.commandLine.appendSwitch('disable-features', 'CalculateNativeWinOcclusion');
 
 // ── Dev mode: use separate instance lock to avoid conflict with installed version ───
 if (!app.isPackaged) {
