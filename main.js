@@ -385,6 +385,9 @@ function handleWindowChange(info) {
     }
   }
 
+  // Don't start new timers while idle — idle detection already stopped them
+  if (idleDetector && idleDetector.getIsIdle()) return;
+
   // Start matched activities that aren't running
   for (const activityId of matchedActivityIds) {
     if (!activeTimers.has(activityId)) {
